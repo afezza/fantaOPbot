@@ -21,6 +21,7 @@ def deserialize(event):
     
     message ={'text': str(data["message"]["text"]),    # Costruisco la risposta da inviare alla chat
               'chat_id': data["message"]["chat"]["id"], 
+              'chat_type': data["message"]["chat"]["type"], 
               'user_id': data["message"]["from"]["username"]}
     return message
 
