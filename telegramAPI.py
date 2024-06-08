@@ -19,7 +19,7 @@ def deserialize(event):
     
     data = json.loads(event["body"])
     
-    message ={'text': str(data["message"]["text"]),    # Costruisco la risposta da inviare alla chat
+    message ={'text': str(data["message"].get("text")),    # Costruisco la risposta da inviare alla chat
               'chat_id': data["message"]["chat"]["id"], 
               'chat_type': data["message"]["chat"]["type"], 
               'user_id': data["message"]["from"]["username"]}
