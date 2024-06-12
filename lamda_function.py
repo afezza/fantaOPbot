@@ -12,13 +12,14 @@ def lambda_handler(event, context):
     
     logger.info(event)
     try:
-        message = telegramAPI.deserialize(event)
+        rcvd_message = telegramAPI.BotMessage(request=event["body"]) # Take the json string of the content from the input event 
+        logger.info("Received: " + rcvd_message.text + " from chat: " + rcvd_message.chat_id)
         
-        if(telegramAPI.BOT_NAME in message['text']):    # Ignoro i messaggi che non sono destinati al bot
-            bot_reply = fantaOP.exec_command(message['text'],message['user_id'])
+        if(telegramAPI.BOT_NAME in rcvd_message.text):    # Ignoro i messaggi che non sono destinati al bot
+            bot_reply = fantaOP.exec_command(rcvd_message.text,rcvd_message.user_id)
+            reply_message = telegramAPI.BotMessage(text=bot_reply,chat_id=rcvd_message.chat_id)
             
-            # Invio la risposta alla chat
-            telegramAPI.sendMessage(message['chat_id'],bot_reply)                
+            reply_message.sendMessage() # Invio la risposta alla chat               
     except Exception as e: 
         logger.setLevel("ERROR")
         # print("[ERR] exception happened =>" + traceback.format_exc())
