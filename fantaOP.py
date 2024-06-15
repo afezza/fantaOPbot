@@ -39,16 +39,18 @@ def print_bot_command_list():
 ###
 # Get information about the auction
 ###
-def retrieve_asta_results(response):
+def retrieve_asta_results(key,response):
     try:
         lista_buste_text = response['Item']['buste_asta']   # Get the list from the table 
         #logger.info(lista_buste_text)
         lista_buste = json.loads(lista_buste_text)  # make a python list from the json
         lista_buste['is_open'] = "False"
-        update_db_column('buste_asta', lista_buste)
+        update_db_column(key,'buste_asta', lista_buste)
         text_answer = "<b>Risultati:</b>\n"
         for busta in lista_buste['buste']:                   # find the user and update the busta
             text_answer += "<u>"+busta["user"]+":</u>\n"
+            logger.info(text_answer)
+
             if (busta["svincolati"] != "None"):
                 text_answer += busta["svincolati"].replace(",","\n") + "\n\n"
             else:
@@ -62,7 +64,7 @@ def retrieve_asta_results(response):
 ###
 # Start the auction
 ###
-def start_asta(response):
+def start_asta(key,response):
     try:
         lista_buste_text = response['Item']['buste_asta']   # Get the list from the table 
         #logger.info(lista_buste_text)
@@ -71,7 +73,7 @@ def start_asta(response):
         for busta in lista_buste['buste']:                   # find the user and update the busta
             busta["svincolati"] = "None"
                 
-        update_db_column('buste_asta', lista_buste)
+        update_db_column(key,'buste_asta', lista_buste)
         text_answer = "Il mercato silenzioso è aperto e chiude alle 23:59!!\n\n"         
         text_answer +="Mandatemi un messaggio in PRIVATO a @FantaOnePiecebot"
     except Exception as e:
@@ -104,7 +106,7 @@ def status_asta(response):
 
     return text_answer
     
-def asta_update(user_id,action,message,response):
+def asta_update(key,user_id,action,message,response):
     index = 0
     offset = 0
     # logger.info(stripped_msg)
@@ -140,7 +142,7 @@ def asta_update(user_id,action,message,response):
                             offers_list += stripped_msg[i+1] + ","
                         busta["svincolati"] = offers_list[:-1]
                 # logger.info(lista_buste)
-                update_db_column('buste_asta',lista_buste)
+                update_db_column(key,'buste_asta', lista_buste)
                 text_answer = "Perfetto la tua busta è stata memorizzata!"
             else:
                 text_answer = "Non è possibile svincolare in questo momento!"
@@ -160,7 +162,7 @@ def run_command(rcvd_message:telegramAPI.BotMessage):
 
         Returns:
         send_message : telegram bot message to send to the client
-        """
+    """
     reply_message = telegramAPI.BotMessage(chat_id=rcvd_message.chat_id)
 
     # Comandi che NON richiedono l'autorizzazione e l'accesso ai dati
@@ -170,24 +172,26 @@ def run_command(rcvd_message:telegramAPI.BotMessage):
 
     # Comandi che NON richiedono l'autorizzazione ma richiedono l'accesso ai dati
     db_response = db_table.get_item(Key={'edition_key':rcvd_message.chat_id}) # Read the table from the DB
+    # logger.info(db_response)
+
     if("/formazione" in rcvd_message.text): # Ritorna la formazione del capitolo 
         reply_message.text = opgtAPI.retrieve_squads_from_app(opgtAPI.chapter_id[1])
         return reply_message
     if("/asta_svincola" in rcvd_message.text): # Salva nel database la busta del partecipante 
-        reply_message.text = asta_update(rcvd_message.user_id,"release",rcvd_message.text,db_response)
+        reply_message.text = asta_update(rcvd_message.chat_id,rcvd_message.user_id,"release",rcvd_message.text,db_response)
         return reply_message
     if("/asta_offri" in rcvd_message.text): # Salva nel database la busta del partecipante 
-        reply_message.text = asta_update(rcvd_message.user_id,"offer",rcvd_message.text,db_response)
+        reply_message.text = asta_update(rcvd_message.chat_id,rcvd_message.user_id,"offer",rcvd_message.text,db_response)
         return reply_message
     # Comandi che richiedono l'autorizzazione e l'accesso ai dati
     if((rcvd_message.user_id == db_response['Item']['president_id']) or 
        (rcvd_message.user_id == db_response['Item']['vicepresident_id'])):
         # chat_id = "-1002194179581"
         if("/asta_risultati" in rcvd_message.text): # Prendi il risultato delle buste 
-            reply_message.text = retrieve_asta_results(db_response)
+            reply_message.text = retrieve_asta_results(rcvd_message.chat_id,db_response)
             return reply_message
         if("/asta_apri" in rcvd_message.text): # Apri l'asta
-            reply_message.text = start_asta(db_response)
+            reply_message.text = start_asta(rcvd_message.chat_id,db_response)
             return reply_message
         if("/asta_stato" in rcvd_message.text): # Apri l'asta
             reply_message.text = status_asta(db_response)
@@ -200,14 +204,21 @@ def run_command(rcvd_message:telegramAPI.BotMessage):
     return reply_message
 
 # Private Functions 
-"""
-Function to update the database column
-# field_name is the column name
-# data is the json containing the data to update
-"""
-def update_db_column(field_name, data): 
+def update_db_column(key:str,field_name, data): 
+    """Updates the database
+        
+        It takes in input the key entry to update and the 
+
+        Parameters:
+        key : row key of the entry to update 
+        field_name : column name to update in the db
+        data : column data to update in the db
+
+        Returns:
+        send_message : telegram bot message to send to the client
+    """
     response = db_table.update_item(
-                    Key={'edition_key':'-1002100931875'},
+                    Key={'edition_key':key},
                     UpdateExpression="set #name = :n",
                     ExpressionAttributeNames={
                         "#name": field_name,
@@ -217,4 +228,5 @@ def update_db_column(field_name, data):
                     },
                     ReturnValues="UPDATED_NEW",
                 )
+    logger.info(response)
 
