@@ -3,6 +3,7 @@ Fanta One Piece bot library
 """
 import json
 import boto3 
+import logging
 import random
 
 import opgtAPI
@@ -11,6 +12,8 @@ import telegramAPI
 # Database env init
 dynamodb = boto3.resource("dynamodb")
 db_table = dynamodb.Table("FantaOP")
+
+logger = logging.getLogger()
 
 not_auth_answers = ["Spiacente pezzente non hai il permesso di farlo!",
                     "Va a papparti qualche fiore!!",
@@ -39,7 +42,7 @@ def print_bot_command_list():
 def retrieve_asta_results(response):
     try:
         lista_buste_text = response['Item']['buste_asta']   # Get the list from the table 
-        #print(lista_buste_text)
+        #logger.info(lista_buste_text)
         lista_buste = json.loads(lista_buste_text)  # make a python list from the json
         lista_buste['is_open'] = "False"
         update_db_column('buste_asta', lista_buste)
@@ -51,7 +54,7 @@ def retrieve_asta_results(response):
             else:
                 text_answer += "Nessuno" + "\n\n"
     except Exception as e:
-        print(e)
+        logger.info(e)
         text_answer ="Si è verificato un errore, per favore riprova!"
 
     return text_answer
@@ -62,7 +65,7 @@ def retrieve_asta_results(response):
 def start_asta(response):
     try:
         lista_buste_text = response['Item']['buste_asta']   # Get the list from the table 
-        #print(lista_buste_text)
+        #logger.info(lista_buste_text)
         lista_buste = json.loads(lista_buste_text)  # make a python list from the json
         lista_buste['is_open'] = "True"
         for busta in lista_buste['buste']:                   # find the user and update the busta
@@ -72,7 +75,7 @@ def start_asta(response):
         text_answer = "Il mercato silenzioso è aperto e chiude alle 23:59!!\n\n"         
         text_answer +="Mandatemi un messaggio in PRIVATO a @FantaOnePiecebot"
     except Exception as e:
-        print(e)
+        logger.info(e)
         text_answer ="Si è verificato un errore, per favore riprova!"
 
     return text_answer
@@ -80,7 +83,7 @@ def start_asta(response):
 def status_asta(response):
     try:
         lista_buste_text = response['Item']['buste_asta']   # Get the list from the table 
-        #print(lista_buste_text)
+        #logger.info(lista_buste_text)
         lista_buste = json.loads(lista_buste_text)  # make a python list from the json
         text_answer ="Elenco mancanti:\n"
         remaining = False
@@ -96,7 +99,7 @@ def status_asta(response):
             else:
                 text_answer += retrieve_asta_results(response)
     except Exception as e:
-        print(e)
+        logger.info(e)
         text_answer ="Si è verificato un errore, per favore riprova!"
 
     return text_answer
@@ -104,7 +107,7 @@ def status_asta(response):
 def asta_update(user_id,action,message,response):
     index = 0
     offset = 0
-    # print(stripped_msg)
+    # logger.info(stripped_msg)
     if(action == "release"):
         index = message.strip().find("svincolati:")
         offset = len("svincolati:")
@@ -125,7 +128,7 @@ def asta_update(user_id,action,message,response):
         index += offset
         try:
             lista_buste_text = response['Item']['buste_asta']   # Get the list from the table 
-            #print(lista_buste_text)
+            #logger.info(lista_buste_text)
             lista_buste = json.loads(lista_buste_text)  # make a python list from the json
             if(lista_buste['is_open'] == "True"):
                 for busta in lista_buste['buste']:                   # find the user and update the busta
@@ -136,13 +139,13 @@ def asta_update(user_id,action,message,response):
                             offers_list += stripped_msg[i].replace('\n','') + " "
                             offers_list += stripped_msg[i+1] + ","
                         busta["svincolati"] = offers_list[:-1]
-                # print(lista_buste)
+                # logger.info(lista_buste)
                 update_db_column('buste_asta',lista_buste)
                 text_answer = "Perfetto la tua busta è stata memorizzata!"
             else:
                 text_answer = "Non è possibile svincolare in questo momento!"
         except Exception as e:
-            print(e)
+            logger.info(e)
             text_answer ="Si è verificato un errore, per favore riprova!"
     return text_answer
 
