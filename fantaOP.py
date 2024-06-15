@@ -187,6 +187,9 @@ def run_command(rcvd_message:telegramAPI.BotMessage):
     if((rcvd_message.user_id == db_response['Item']['president_id']) or 
        (rcvd_message.user_id == db_response['Item']['vicepresident_id'])):
         # chat_id = "-1002194179581"
+        if("/scarica_voti" in rcvd_message.text): 
+            reply_message.text = opgtAPI.retrieve_rank_from_app(opgtAPI.chapter_id[1])
+            return reply_message
         if("/asta_risultati" in rcvd_message.text): # Prendi il risultato delle buste 
             reply_message.text = retrieve_asta_results(rcvd_message.chat_id,db_response)
             return reply_message

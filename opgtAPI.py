@@ -12,13 +12,15 @@ logger = logging.getLogger()
 http = urllib3.PoolManager()
 
 teams_id = ["9938","9346","9960","9946","9940","9941"]
-chapter_id = ['1111','1112']
-chat_id = ""
-teams_actual_players = []
+chapter_id = ['1111','1112','1113','1114','1115','1116','1117']
+
 role_query = "//div[@class='col-sm-2 col-xs-4']"
 role_query_plus = "//div[@class='col-sm-2 col-xs-4']//option[@selected='selected']"
 name_query = "//div[@class='col-sm-4 col-xs-4']"
 cap_vice_query = "//div[@class='col-sm-1 col-xs-1 text-center']"    
+
+vote_name_query = "//div[@class='col-xs-9 col-sm-4']"
+vote_score_query = "//div[@class='col-xs-12 col-sm-6 text-right']"   
 
 # http_response = requests.get("https://www.opgt.it/fantaop/squadre/formazione/?id_squadra=9938&capitolo=1111")
 # http_response = requests.get("https://www.opgt.it/fantaop/squadre/formazione/?id_squadra="+ teams_id[2] +"&capitolo="+ chapter_id[1])
@@ -73,4 +75,38 @@ def retrieve_squads_from_app(chapter_id):
         chapter['squads'].append(actual_squad)
         
     # return str(json.dumps(chapter))
+    return text_answer
+
+
+def retrieve_rank_from_app(chapter_id):
+    
+    # Create the chapter object
+    chapter = {"chapter": chapter_id, "squads": []}
+    
+    # Start creating the answer
+    text_answer = "<b>Capitolo "+ chapter_id + "</b>:"
+    
+    # Retrieve the info from the web
+    http_response = http.request('GET',
+                                "https://www.opgt.it/fantaop/voti/analisi/?capitolo="+chapter_id,
+                                retries = False)
+    print(http_response.data)
+
+    # Parse and query the web page
+    root = etree.HTML(http_response.data)
+    
+    name_res = root.xpath(vote_name_query) 
+    if not name_res:
+        print("Name does not exist")
+    
+    vote_score_res = root.xpath(vote_score_query) 
+    if not vote_score_res:
+        print("Score does not exist")
+
+    for i in range(len(name_res)):
+        # logger.info(name_res[i][0].text.strip())
+        text_answer += "\n" + name_res[i][0].text.strip() + "\n"
+        for j in range(len(vote_score_res[i])-1):
+            text_answer += vote_score_res[i][j][0].text   
+
     return text_answer
