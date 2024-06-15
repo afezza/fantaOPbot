@@ -6,6 +6,7 @@ import boto3
 import random
 
 import opgtAPI
+import telegramAPI
 
 # Database env init
 dynamodb = boto3.resource("dynamodb")
@@ -145,41 +146,55 @@ def asta_update(user_id,action,message,response):
             text_answer ="Si è verificato un errore, per favore riprova!"
     return text_answer
 
-def exec_command(message,user_id):
-    global chat_id
+def run_command(rcvd_message:telegramAPI.BotMessage):
+    """Parse and run the command required by the user
+        
+        It takes in input a telegram bot message and returns the message to send
+        back to the user.
+
+        Parameters:
+        rcvd_message : telegram bot message received from the client
+
+        Returns:
+        send_message : telegram bot message to send to the client
+        """
+    reply_message = telegramAPI.BotMessage(chat_id=rcvd_message.chat_id)
+
     # Comandi che NON richiedono l'autorizzazione e l'accesso ai dati
-    if("/help" in message): # Ritorna l'elenco dei comandi disponibili 
-        bot_reply = print_bot_command_list()
-        return bot_reply
+    if("/help" in rcvd_message.text): # Ritorna l'elenco dei comandi disponibili 
+        reply_message.text = print_bot_command_list()
+        return reply_message
 
     # Comandi che NON richiedono l'autorizzazione ma richiedono l'accesso ai dati
-    db_response = db_table.get_item(Key={'edition_key':'-1002100931875'}) # Read the table from the DB
-    if("/formazione" in message): # Ritorna la formazione del capitolo 
-        bot_reply = opgtAPI.retrieve_squads_from_app(opgtAPI.chapter_id[1])
-        return bot_reply
-    if("/asta_svincola" in message): # Salva nel database la busta del partecipante 
-        bot_reply = asta_update(user_id,"release",message,db_response)
-        return bot_reply
-    if("/asta_offri" in message): # Salva nel database la busta del partecipante 
-        bot_reply = asta_update(user_id,"offer",message,db_response)
-        return bot_reply
+    db_response = db_table.get_item(Key={'edition_key':rcvd_message.chat_id}) # Read the table from the DB
+    if("/formazione" in rcvd_message.text): # Ritorna la formazione del capitolo 
+        reply_message.text = opgtAPI.retrieve_squads_from_app(opgtAPI.chapter_id[1])
+        return reply_message
+    if("/asta_svincola" in rcvd_message.text): # Salva nel database la busta del partecipante 
+        reply_message.text = asta_update(rcvd_message.user_id,"release",rcvd_message.text,db_response)
+        return reply_message
+    if("/asta_offri" in rcvd_message.text): # Salva nel database la busta del partecipante 
+        reply_message.text = asta_update(rcvd_message.user_id,"offer",rcvd_message.text,db_response)
+        return reply_message
     # Comandi che richiedono l'autorizzazione e l'accesso ai dati
-    if((user_id == db_response['Item']['president_id']) or (user_id == db_response['Item']['vicepresident_id'])):
+    if((rcvd_message.user_id == db_response['Item']['president_id']) or 
+       (rcvd_message.user_id == db_response['Item']['vicepresident_id'])):
         # chat_id = "-1002194179581"
-        if("/asta_risultati" in message): # Prendi il risultato delle buste 
-            bot_reply = retrieve_asta_results(db_response)
-            return bot_reply
-        if("/asta_apri" in message): # Apri l'asta
-            bot_reply = start_asta(db_response)
-            return bot_reply
-        if("/asta_stato" in message): # Apri l'asta
-            bot_reply = status_asta(db_response)
-            return bot_reply
+        if("/asta_risultati" in rcvd_message.text): # Prendi il risultato delle buste 
+            reply_message.text = retrieve_asta_results(db_response)
+            return reply_message
+        if("/asta_apri" in rcvd_message.text): # Apri l'asta
+            reply_message.text = start_asta(db_response)
+            return reply_message
+        if("/asta_stato" in rcvd_message.text): # Apri l'asta
+            reply_message.text = status_asta(db_response)
+            return reply_message
     else:
         random.seed()
-        bot_reply = not_auth_answers[random.randint(0,len(not_auth_answers)-1)]
-        return bot_reply
-    return "Mi dispiace non so come aiutarti"
+        reply_message.text = not_auth_answers[random.randint(0,len(not_auth_answers)-1)]
+        return reply_message
+    reply_message.text = "Mi dispiace non so come aiutarti"
+    return reply_message
 
 # Private Functions 
 """
