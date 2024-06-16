@@ -88,7 +88,7 @@ def retrieve_squads_from_app(key:str,db_entry):
                     actual_player['role'] = cap_vice_res[(i*2)+1].text.strip()
                 
                 actual_squad['players'].append(actual_player)
-                text_answer += "- "+ actual_player['name'] + ": "+ actual_player['role'] + "\n"
+                text_answer += "* "+ actual_player['name'] + ": "+ actual_player['role'] + "\n"
         
             match['squads'].append(actual_squad)
         break
@@ -98,6 +98,39 @@ def retrieve_squads_from_app(key:str,db_entry):
 
     return text_answer
 
+def retrieve_squads_from_db(key:str,db_entry,day):
+    """Loads the list of squads stored on the database.
+
+        Parameters:
+        key : chat id of the corresponding tournment
+        db_entry : data of the corresponding tournment stored on the database 
+        chapter : the chapter to be retrieved 
+
+        Returns:
+        text_match_answer : the squads retrieved from the web app 
+    """
+    # Create a list for the matches and the teams from db entry
+    match_list = json.loads(db_entry['Item']['match_list']) 
+    team_list = json.loads(db_entry['Item']['teams']) 
+
+    team_name_list = {}
+    for team in team_list:
+        team_name_list[team['team_id']]=team['team_name']
+    
+    # Find in the list the first unplayed match
+    if(day > len(match_list)):
+        return "Mi dispiace ma la giornata richiesta non esiste"
+    
+    text_answer = "<b>Capitolo "+ match_list[day]['chapter'] + "</b>:\n"
+
+    # Retrieve the info from the database per each team in the list
+    team_id = team_name_list[team['team_id']]
+    for team in match_list[day]['squads']:
+        text_answer += "\n<u>Team "+ team_id + "</u>: "+ team['total_score'] + "\n"
+        for player in team['players']:
+            text_answer += " &#8226 "+ player['name'] + ":\n"
+            text_answer += " { "+ player['score'] + "}\n"
+    return text_answer
 
 def retrieve_rank_from_app(chapter_id):
     
