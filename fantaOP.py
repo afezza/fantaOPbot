@@ -2,16 +2,12 @@
 Fanta One Piece bot library
 """
 import json
-import boto3 
 import logging
 import random
 
 import opgtAPI
+import dynamodbAPI
 import telegramAPI
-
-# Database env init
-dynamodb = boto3.resource("dynamodb")
-db_table = dynamodb.Table("FantaOP")
 
 logger = logging.getLogger()
 
@@ -45,7 +41,7 @@ def retrieve_asta_results(key,response):
         #logger.info(lista_buste_text)
         lista_buste = json.loads(lista_buste_text)  # make a python list from the json
         lista_buste['is_open'] = "False"
-        update_db_column(key,'buste_asta', lista_buste)
+        dynamodbAPI.update_db_column(key,'buste_asta', lista_buste)
         text_answer = "<b>Risultati:</b>\n"
         for busta in lista_buste['buste']:                   # find the user and update the busta
             text_answer += "<u>"+busta["user"]+":</u>\n"
@@ -73,7 +69,7 @@ def start_asta(key,response):
         for busta in lista_buste['buste']:                   # find the user and update the busta
             busta["svincolati"] = "None"
                 
-        update_db_column(key,'buste_asta', lista_buste)
+        dynamodbAPI.update_db_column(key,'buste_asta', lista_buste)
         text_answer = "Il mercato silenzioso è aperto e chiude alle 23:59!!\n\n"         
         text_answer +="Mandatemi un messaggio in PRIVATO a @FantaOnePiecebot"
     except Exception as e:
@@ -142,7 +138,7 @@ def asta_update(key,user_id,action,message,response):
                             offers_list += stripped_msg[i+1] + ","
                         busta["svincolati"] = offers_list[:-1]
                 # logger.info(lista_buste)
-                update_db_column(key,'buste_asta', lista_buste)
+                dynamodbAPI.update_db_column(key,'buste_asta', lista_buste)
                 text_answer = "Perfetto la tua busta è stata memorizzata!"
             else:
                 text_answer = "Non è possibile svincolare in questo momento!"
@@ -171,7 +167,7 @@ def run_command(rcvd_message:telegramAPI.BotMessage):
         return reply_message
 
     # Comandi che NON richiedono l'autorizzazione ma richiedono l'accesso ai dati
-    db_response = db_table.get_item(Key={'edition_key':rcvd_message.chat_id}) # Read the table from the DB
+    db_response = dynamodbAPI.get_db_entry(rcvd_message.chat_id) # Read the table from the DB
     # logger.info(db_response)
 
     if("/formazione" in rcvd_message.text): # Ritorna la formazione del capitolo 
@@ -186,7 +182,6 @@ def run_command(rcvd_message:telegramAPI.BotMessage):
     # Comandi che richiedono l'autorizzazione e l'accesso ai dati
     if((rcvd_message.user_id == db_response['Item']['president_id']) or 
        (rcvd_message.user_id == db_response['Item']['vicepresident_id'])):
-        # chat_id = "-1002194179581"
         if("/scarica_voti" in rcvd_message.text): 
             reply_message.text = opgtAPI.retrieve_rank_from_app(opgtAPI.chapter_id[1])
             return reply_message
@@ -205,31 +200,3 @@ def run_command(rcvd_message:telegramAPI.BotMessage):
         return reply_message
     reply_message.text = "Mi dispiace non so come aiutarti"
     return reply_message
-
-# Private Functions 
-def update_db_column(key:str,field_name, data): 
-    """Updates the database
-        
-        It takes in input the key entry to update and the 
-
-        Parameters:
-        key : row key of the entry to update 
-        field_name : column name to update in the db
-        data : column data to update in the db
-
-        Returns:
-        send_message : telegram bot message to send to the client
-    """
-    response = db_table.update_item(
-                    Key={'edition_key':key},
-                    UpdateExpression="set #name = :n",
-                    ExpressionAttributeNames={
-                        "#name": field_name,
-                    },
-                    ExpressionAttributeValues={
-                        ":n": str(json.dumps(data)),
-                    },
-                    ReturnValues="UPDATED_NEW",
-                )
-    logger.info(response)
-
