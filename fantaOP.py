@@ -170,8 +170,8 @@ def run_command(rcvd_message:telegramAPI.BotMessage):
     db_response = dynamodbAPI.get_db_entry(rcvd_message.chat_id) # Read the table from the DB
     # logger.info(db_response)
 
-    if("/formazione" in rcvd_message.text): # Ritorna la formazione del capitolo 
-        reply_message.text = opgtAPI.retrieve_squads_from_app(opgtAPI.chapter_id[1])
+    if("/mostra_formazioni" in rcvd_message.text): # Ritorna la formazione del capitolo 
+        reply_message.text = "Comando non ancora disponibile"
         return reply_message
     if("/asta_svincola" in rcvd_message.text): # Salva nel database la busta del partecipante 
         reply_message.text = asta_update(rcvd_message.chat_id,rcvd_message.user_id,"release",rcvd_message.text,db_response)
@@ -182,6 +182,9 @@ def run_command(rcvd_message:telegramAPI.BotMessage):
     # Comandi che richiedono l'autorizzazione e l'accesso ai dati
     if((rcvd_message.user_id == db_response['Item']['president_id']) or 
        (rcvd_message.user_id == db_response['Item']['vicepresident_id'])):
+        if("/scarica_formazioni" in rcvd_message.text): # Ritorna la formazione del capitolo 
+            reply_message.text = opgtAPI.retrieve_squads_from_app(rcvd_message.chat_id,db_response)
+            return reply_message
         if("/scarica_voti" in rcvd_message.text): 
             reply_message.text = opgtAPI.retrieve_rank_from_app(opgtAPI.chapter_id[1])
             return reply_message
