@@ -13,9 +13,6 @@ logger = logging.getLogger()
 # HTTP env init 
 http = urllib3.PoolManager()
 
-# teams_id = ["9938","9346","9960","9946","9940","9941"]
-# chapter_id = ['1111','1112','1113','1114','1115','1116','1117']
-
 role_query = "//div[@class='col-sm-2 col-xs-4']"
 role_query_plus = "//div[@class='col-sm-2 col-xs-4']//option[@selected='selected']"
 name_query = "//div[@class='col-sm-4 col-xs-4']"
@@ -39,7 +36,6 @@ def retrieve_squads_from_app(key:str,db_entry):
     match_list = json.loads(db_entry['Item']['match_list']) 
     team_list = json.loads(db_entry['Item']['teams']) 
 
-
     # Find in the list the first unplayed match
     for match in match_list:
         if(match['state'] != "None"):
@@ -48,7 +44,7 @@ def retrieve_squads_from_app(key:str,db_entry):
         text_answer = "<b>Capitolo "+ match['chapter'] + "</b>:\n"
         
         # Update match state 
-        match['state'] = "WAIT_CHAPTER"
+        match['state'] = "WAIT_RANKING"
         match['squads'] = []
 
         # Retrieve the info from the web app per each team in the list
@@ -62,21 +58,34 @@ def retrieve_squads_from_app(key:str,db_entry):
 
             role_res = root.xpath(role_query) 
             if not role_res:
-                logger.info("Role does not exist")
+                logger.error("Role does not exist")
             elif(role_res[0].text.strip() == ""): #questo serve quando i voti non sono stati ancora pubblicati
                 role_res = root.xpath(role_query_plus) 
                 if not role_res:
-                    logger.info("Role does not exist")
+                    logger.error("Role does not exist")
 
             name_res = root.xpath(name_query) 
             if not name_res:
-                logger.info("Name does not exist")
+                logger.error("Name does not exist")
 
             cap_vice_res = root.xpath(cap_vice_query) 
             if not cap_vice_res:
-                logger.info("Cap does not exist")
+                logger.error("Cap does not exist")
+            else:   #questo serve quando i voti non sono stati ancora pubblicati
+                for i in range(len(name_res)):
+                    # logging.info(cap_vice_res[(i*2)][-1].attrib)
+                    try:
+                        cap_vice_res[(i*2)][-1].attrib['checked']
+                        cap_vice_res[(i*2)].text = "Capitano"
+                    except:
+                        logging.error("Exception happened for capitano")
+                    try:
+                        cap_vice_res[(i*2)+1][-1].attrib['checked']
+                        cap_vice_res[(i*2)+1].text= "Vice"
+                    except:
+                        logging.error("Exception happened for vice")
 
-            actual_squad = {"team": team['team_id'], "total_score": "0" ,"players": []}
+            actual_squad = {"team_id": team['team_id'], "total_score": "0" ,"players": []}
             text_answer += "\n<u>Team "+ team['team_name'] + "</u>:\n"
             for i in range(len(role_res)):
                 actual_player = {"name": name_res[i][0].text.strip(), 
