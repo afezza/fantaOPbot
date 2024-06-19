@@ -141,35 +141,89 @@ def retrieve_squads_from_db(key:str,db_entry,day):
             text_answer += " { "+ player['score'] + "}\n"
     return text_answer
 
-def retrieve_rank_from_app(chapter_id):
-    
-    # Create the chapter object
-    chapter = {"chapter": chapter_id, "squads": []}
-    
-    # Start creating the answer
-    text_answer = "<b>Capitolo "+ chapter_id + "</b>:"
-    
-    # Retrieve the info from the web
-    http_response = http.request('GET',
-                                "https://www.opgt.it/fantaop/voti/analisi/?capitolo="+chapter_id,
-                                retries = False)
-    print(http_response.data)
+def retrieve_rank_from_app(key:str,db_entry):
+    """Connects to OPGT web app to download the list of rank for the players 
+        and store it on the database.
 
-    # Parse and query the web page
-    root = etree.HTML(http_response.data)
-    
-    name_res = root.xpath(vote_name_query) 
-    if not name_res:
-        print("Name does not exist")
-    
-    vote_score_res = root.xpath(vote_score_query) 
-    if not vote_score_res:
-        print("Score does not exist")
+        Parameters:
+        key : chat id of the corresponding tournment
+        db_entry : data of the corresponding tournment stored on the database 
 
-    for i in range(len(name_res)):
-        # logger.info(name_res[i][0].text.strip())
-        text_answer += "\n" + name_res[i][0].text.strip() + "\n"
-        for j in range(len(vote_score_res[i])-1):
-            text_answer += vote_score_res[i][j][0].text   
+        Returns:
+        text_match_answer : the ranks retrieved from the web app 
+    """
+    # Create a list for the matches and the teams from db entry
+    match_list = json.loads(db_entry['Item']['match_list']) 
+    team_list = json.loads(db_entry['Item']['teams']) 
 
-    return text_answer
+    team_name_list = {}
+    for team in team_list:
+        team_name_list[team['team_id']]=team['team_name']
+    
+    # Find in the list the first unplayed match
+    match_count = 0
+    for match in match_list:
+        if(match['state'] != "WAIT_RANKING"):
+            match_count += 1
+            continue
+    
+        # Start creating the answer
+        text_answer = "<b>Capitolo "+ match['chapter'] + "</b>:"
+    
+        # Retrieve the info from the web
+        http_response = http.request('GET',
+                                    "https://www.opgt.it/fantaop/voti/analisi/?capitolo=" + match['chapter'],
+                                    retries = False)
+        logging.info(http_response.data)
+
+        # Parse and query the web page
+        root = etree.HTML(http_response.data)
+        
+        name_res = root.xpath(vote_name_query) 
+        if not name_res:
+            logging.info("Name does not exist")
+            return "I voti non sono ancora stati pubblicati"
+
+        vote_score_res = root.xpath(vote_score_query) 
+        if not vote_score_res:
+            print("Score does not exist")
+
+        # Search for the players rank in the retrieved list
+        for team in match['squads']:
+            # team['total_score'] = "0"   # This should not be needed 
+            team_id = team_name_list[team['team_id']]
+            text_answer += "\n<u>Team "+ team_id + "</u>: "
+            score_index = len(text_answer)
+            text_answer += "\n"
+
+            for player in team['players']:
+                ranked_list_len = len(name_res)
+                i = 0
+                while i < ranked_list_len:
+                    if(name_res[i][0].text.strip() == player['name']):
+                        text_answer += " &#8226 "+ player['name'] + ": ("+player['role'] + ")\n"
+                        player['score'] = {}
+                        for j in range(len(vote_score_res[i])-1):
+                            name = vote_score_res[i][j][0].text.split()[0]
+                            rank = vote_score_res[i][j][0].text.split()[1].replace('(','').replace(')','')
+                            player['score'][name] = rank
+                            if(player['role'] == "Capitano"):
+                                rank = str(float(rank) * 2)
+                            if(player['role'] == "Vice"):
+                                rank = str(float(rank) * 1.5)
+                            team['total_score'] = str(float(team['total_score']) + float(rank))
+                        text_answer += str(player['score']) + "\n"
+                        name_res.pop(i)
+                        vote_score_res.pop(i)
+                        ranked_list_len -= 1
+                    else:
+                        i += 1
+
+            text_answer = text_answer[:score_index] + team['total_score'] + text_answer[score_index:]  
+        # Update match state 
+        match['state'] = "WAIT_CONFIRMATION"
+        # Store data on database
+        dynamodbAPI.update_db_column(key,'match_list', match_list)
+        return text_answer
+
+    return "Impossibile scaricare i voti"

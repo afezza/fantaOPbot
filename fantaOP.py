@@ -187,7 +187,7 @@ def run_command(rcvd_message:telegramAPI.BotMessage):
             reply_message.text = opgtAPI.retrieve_squads_from_app(rcvd_message.chat_id,db_response)
             return reply_message
         if("/scarica_voti" in rcvd_message.text): 
-            reply_message.text = opgtAPI.retrieve_rank_from_app(opgtAPI.chapter_id[1])
+            reply_message.text = opgtAPI.retrieve_rank_from_app(rcvd_message.chat_id,db_response)
             return reply_message
         if("/asta_risultati" in rcvd_message.text): # Prendi il risultato delle buste 
             reply_message.text = retrieve_asta_results(rcvd_message.chat_id,db_response)
