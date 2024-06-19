@@ -133,13 +133,14 @@ def retrieve_squads_from_db(key:str,db_entry,day):
     text_answer = "<b>Capitolo "+ match_list[day]['chapter'] + "</b>:\n"
 
     # Retrieve the info from the database per each team in the list
-    team_id = team_name_list[team['team_id']]
     for team in match_list[day]['squads']:
+        team_id = team_name_list[team['team_id']]
         text_answer += "\n<u>Team "+ team_id + "</u>: "+ team['total_score'] + "\n"
         for player in team['players']:
-            text_answer += " &#8226 "+ player['name'] + ":\n"
-            text_answer += " { "+ player['score'] + "}\n"
+            text_answer += " &#8226 "+ player['name'] + ": ("+player['role'] + ")\n"
+            text_answer += " { "+ str(player['score']) + "}\n"
     return text_answer
+
 
 def retrieve_rank_from_app(key:str,db_entry):
     """Connects to OPGT web app to download the list of rank for the players 
