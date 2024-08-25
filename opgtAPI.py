@@ -191,10 +191,12 @@ def retrieve_rank_from_app(key:str,db_entry):
 
         # Search for the players rank in the retrieved list
         for team in match['squads']:
-            # team['total_score'] = "0"   # This should not be needed 
+            team['total_score'] = "0"   # This should not be needed 
             team_id = team_name_list[team['team_id']]
             text_answer += "\n<u>Team "+ team_id + "</u>: "
             score_index = len(text_answer)
+            player_counter = 0
+            reserve_rank_list = [0.0, 0.0, 0.0]
             text_answer += "\n"
 
             for player in team['players']:
@@ -210,16 +212,27 @@ def retrieve_rank_from_app(key:str,db_entry):
                             player['score'][name] = rank
                             if(player['role'] == "Capitano"):
                                 rank = str(float(rank) * 2)
-                            if(player['role'] == "Vice"):
+                            elif(player['role'] == "Vice"):
                                 rank = str(float(rank) * 1.5)
+                            elif("riserva" in player['role']):
+                                reserve_rank_list[int(player['role'][0])-1] += float(rank)
+                                rank = '0'
                             team['total_score'] = str(float(team['total_score']) + float(rank))
                         text_answer += str(player['score']) + "\n"
+                        player_counter += 1
                         name_res.pop(i)
                         vote_score_res.pop(i)
                         ranked_list_len -= 1
                     else:
                         i += 1
 
+            for rank in reserve_rank_list:
+                if ( rank == 0.0 ):
+                    continue
+                if (player_counter < 7):
+                    team['total_score'] = str(float(team['total_score']) + rank)
+                    player_counter += 1
+    
             text_answer = text_answer[:score_index] + team['total_score'] + text_answer[score_index:]  
         # Update match state 
         match['state'] = "WAIT_CONFIRMATION"
