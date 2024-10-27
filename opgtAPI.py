@@ -141,6 +141,53 @@ def retrieve_squads_from_db(key:str,db_entry,day):
             text_answer += " { "+ str(player['score']) + "}\n"
     return text_answer
 
+def retrieve_classification_from_db(key:str,db_entry):
+    """Loads the list of squads stored on the database.
+
+        Parameters:
+        key : chat id of the corresponding tournment
+        db_entry : data of the corresponding tournment stored on the database 
+        chapter : the chapter to be retrieved 
+
+        Returns:
+        text_match_answer : the squads retrieved from the web app 
+    """
+    # Create a list for the matches and the teams from db entry
+    match_list = json.loads(db_entry['Item']['match_list']) 
+    team_list = json.loads(db_entry['Item']['teams']) 
+
+    team_name_collection = {}
+    for team in team_list:
+        team_name_collection[team['team_id']]= {
+            "name": team['team_name'],
+            "scores" : [],
+            "total_score" : 0.0}
+    
+    # Stop whenthe first uncomplete match is found
+    team_name_list = []
+    for match in match_list:
+        if(match['state'] != "COMPLETED"):
+            break
+    
+        for team in match['squads']:
+            team_name_collection[team['team_id']]['scores'].append(team['total_score'])
+            team_name_collection[team['team_id']]['total_score'] += float(team['total_score'])
+    
+    for team in team_name_collection:
+        logger.info(team_name_collection[team])
+        team_name_list.append(team_name_collection[team])
+    
+    ordered_name_list = sorted(team_name_list,key=lambda team: team['total_score'],reverse=True)
+
+    text_answer = ""
+    # Print the ordered classification
+    for team in ordered_name_list:
+        text_answer += "\n<u>Team "+ team['name'] + "</u>: <b>" 
+        text_answer += str(team['total_score']) + "</b> => "
+        for score in team['scores']:
+            text_answer += score + " | "
+        
+    return text_answer
 
 def retrieve_rank_from_app(key:str,db_entry):
     """Connects to OPGT web app to download the list of rank for the players 
