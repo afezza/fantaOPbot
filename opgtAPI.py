@@ -181,12 +181,14 @@ def retrieve_classification_from_db(key:str,db_entry):
 
     text_answer = ""
     # Print the ordered classification
-    for team in ordered_name_list:
-        text_answer += "\n<u>Team "+ team['name'] + "</u>: <b>" 
-        text_answer += str(team['total_score']) + "</b> => "
-        for score in team['scores']:
-            text_answer += score + " | "
-        
+    # for team in ordered_name_list:
+    #     text_answer += "\n<u>Team "+ team['name'] + "</u>: <b>" 
+    #     text_answer += str(team['total_score']) + "</b> => "
+    #     for score in team['scores']:
+    #         text_answer += score + " | "
+    text_answer += 'Per vedere la classifica usa questo link\n'
+    text_answer += 'https://wj1r9bp4q4.execute-api.eu-north-1.amazonaws.com/classification'
+
     return text_answer
 
 def retrieve_rank_from_app(key:str,db_entry):
