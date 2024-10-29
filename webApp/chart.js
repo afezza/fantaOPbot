@@ -1,18 +1,13 @@
 const data = [{"x":"Fascismo e libertà","value":246,"details":{"1123":"23.0","1124":"42.0","1125":"5.0","1126":"49.0","1127":"44.0","1128":"20.0","1129":"34.0","1130":"29.0"}},{"x":"Quello porco","value":225.5,"details":{"1123":"47.5","1124":"34.5","1125":"0","1126":"45.0","1127":"26.0","1128":"18.5","1129":"19.5","1130":"34.5"}},{"x":"L'amianto D. Bagnoli","value":177,"details":{"1123":"20.0","1124":"14.0","1125":"9.0","1126":"26.0","1127":"38.0","1128":"40.0","1129":"20.0","1130":"10.0"}},{"x":"cisisniffaingiro","value":114.5,"details":{"1123":"22.0","1124":"22.0","1125":"4.0","1126":"43.0","1127":"0","1128":"2.0","1129":"0","1130":"21.5"}},{"x":"Mmandint appiomb","value":110.5,"details":{"1123":"10.5","1124":"18.0","1125":"10.0","1126":"19.0","1127":"16.0","1128":"20.0","1129":"12.0","1130":"5.0"}},{"x":"EUSTASS-YA!","value":98.5,"details":{"1123":"16.0","1124":"15.0","1125":"14.0","1126":"37.0","1127":"0","1128":"0","1129":"0","1130":"16.5"}}];
 
 // Create a column chart
-const columnChart = anychart.column();
+const columnChart = anychart.bar();
 
-// Set the data
-columnChart.data(data);
+// Set the data and show the labels on top of the bar
+let series = columnChart.bar(data);
+columnChart.labels().enabled(true).anchor("left-center").position("right-center");
 
-// Set the chart title
-columnChart.title('Classifica Fanta OP');
-
-// Customize the column color
-columnChart.palette(['#7C00FE']); // Dark violet color
-
-// tooltip settings
+// Set tooltip to show statistics
 var tooltip = columnChart.tooltip();
 tooltip.positionMode("point");
 tooltip.titleFormat("{%x}: {%value}");
@@ -62,22 +57,18 @@ function drawDonutChart(details) {
     // Set data and title for the donut chart
     donutChart.data(donutData);
     donutChart.title(details.x);
-
     donutChart.innerRadius("75%");
 
-    // set the position of labels and format them
+    // Set the position of labels and format them
     donutChart.labels().format('{%value}{decimalsCount:1,zeroFillDecimals:true}');
     donutChart.labels().position("outside");
-
-    // configure connectors
     donutChart.connectorStroke({color: "#595959", thickness: 2, dash:"2 2"});
 
-    // create and configure a label
+    // Create and configure a custom label
     var label = anychart.standalones.label();
     let maxVal = 0;
     let minVal = 1000;
     donutData.forEach((value,key) => {
-        console.log("min "+minVal+" max "+maxVal+" Actual "+value.value);
         if(Number(value.value) > Number(maxVal)){maxVal = value.value;}
         if(Number(value.value) < Number(minVal)){minVal = value.value;}
     });
@@ -89,7 +80,7 @@ function drawDonutChart(details) {
     label.hAlign("center");
     label.vAlign("middle");
 
-    // set the label as the center content
+    // Set the label as the center content
     donutChart.center().content(label);
 
     // Shows the chapters with 0 total points in the legend

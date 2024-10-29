@@ -32,18 +32,13 @@ const classification_body = `
     const data = //COLUMN_DATA;
 
     // Create a column chart
-    const columnChart = anychart.column();
+    const columnChart = anychart.bar();
 
-    // Set the data
-    columnChart.data(data);
+    // Set the data and show the labels on top of the bar
+    let series = columnChart.bar(data);
+    columnChart.labels().enabled(true).anchor("left-center").position("right-center");
 
-    // Set the chart title
-    columnChart.title('Classifica Fanta OP');
-
-    // Customize the column color
-    columnChart.palette(['#7C00FE']); // Dark violet color
-
-    // tooltip settings
+    // Set tooltip to show statistics
     var tooltip = columnChart.tooltip();
     tooltip.positionMode("point");
     tooltip.titleFormat("{%x}: {%value}");
@@ -93,17 +88,14 @@ const classification_body = `
         // Set data and title for the donut chart
         donutChart.data(donutData);
         donutChart.title(details.x);
-
         donutChart.innerRadius("75%");
 
-        // set the position of labels and format them
+        // Set the position of labels and format them
         donutChart.labels().format('{%value}{decimalsCount:1,zeroFillDecimals:true}');
         donutChart.labels().position("outside");
-
-        // configure connectors
         donutChart.connectorStroke({color: "#595959", thickness: 2, dash:"2 2"});
 
-        // create and configure a label
+        // Create and configure a custom label
         var label = anychart.standalones.label();
         let maxVal = 0;
         let minVal = 1000;
@@ -119,9 +111,9 @@ const classification_body = `
         label.hAlign("center");
         label.vAlign("middle");
 
-        // set the label as the center content
+        // Set the label as the center content
         donutChart.center().content(label);
-        
+
         // Shows the chapters with 0 total points in the legend
         var legend = donutChart.legend();
         legend.itemsFormatter(function () {
