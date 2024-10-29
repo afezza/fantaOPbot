@@ -72,6 +72,26 @@ function drawDonutChart(details) {
     // configure connectors
     donutChart.connectorStroke({color: "#595959", thickness: 2, dash:"2 2"});
 
+    // create and configure a label
+    var label = anychart.standalones.label();
+    let maxVal = 0;
+    let minVal = 1000;
+    donutData.forEach((value,key) => {
+        console.log("min "+minVal+" max "+maxVal+" Actual "+value.value);
+        if(Number(value.value) > Number(maxVal)){maxVal = value.value;}
+        if(Number(value.value) < Number(minVal)){minVal = value.value;}
+    });
+    label.text("Max: " + maxVal + "\nMin: " + minVal);
+    label.fontColor("#60727b");
+    label.fontSize(15);
+    label.width("100%");
+    label.height("100%");
+    label.hAlign("center");
+    label.vAlign("middle");
+
+    // set the label as the center content
+    donutChart.center().content(label);
+
     // Shows the chapters with 0 total points in the legend
     var legend = donutChart.legend();
     legend.itemsFormatter(function () {
