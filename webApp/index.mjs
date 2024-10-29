@@ -47,6 +47,29 @@ const classification_body = `
     // Customize the column color
     columnChart.palette(['#7C00FE']); // Dark violet color
 
+    // tooltip settings
+    var tooltip = columnChart.tooltip();
+    tooltip.positionMode("point");
+    tooltip.titleFormat("{%x}: {%value}");
+    tooltip.format((e) => {
+        statistics = {first: 0.0, before: 0.0, after: 0.0, last: 0.0};
+        if(e.index > 0) 
+        {
+            statistics.first = data[0].value - data[e.index].value;  // Check the first classified
+            statistics.before = data[e.index-1].value - data[e.index].value; // Check the one classified before
+        }
+        if(e.index < data.length-1) 
+        {
+            statistics.after = data[e.index].value - data[e.index+1].value; // Check the one classified after 
+            statistics.last = data[e.index].value - data[data.length-1].value; // Check the last classified
+        }
+        toolTipText = "dal primo: " + statistics.first + "\\ndal precedente: " + statistics.before;
+        toolTipText +="\\ndal successivo: " + statistics.after + "\\ndall'ultimo: " + statistics.last;
+        console.log("Team " + data[e.index].x + " statistics: Total:" + data[e.index].value, statistics); // Log details being passed
+
+        return toolTipText
+    });
+
     // Draw the column chart
     columnChart.container('column-container');
     columnChart.draw();
@@ -114,8 +137,6 @@ const classification_body = `
 
         drawDonutChart(categoryDetails); // Draw the donut chart with the details
     });
-
-
     </script>
 </body>
 </html>
