@@ -82,8 +82,20 @@ const classification_body = `
         // configure connectors
         donutChart.connectorStroke({color: "#595959", thickness: 2, dash:"2 2"});
 
-        // disable the legend
-        donutChart.legend(false);
+        // Shows the chapters with 0 total points in the legend
+        var legend = donutChart.legend();
+        legend.itemsFormatter(function () {
+            let colors = ["#2196F3", "#F44336", "#4CAF50", "#FFEB3B"];
+            let legendItems = [];
+            donutData.forEach((value,key) => {
+                if(value.value == '0')
+                {
+                    legendItems.push({text: value.x, iconFill: colors[Math.ceil(3*Math.random())] ,iconType: "circle"});
+                }
+            });
+            console.log(legendItems);
+            return legendItems;        
+        });
 
         // Draw the donut chart
         donutChart.container('donut-container');
@@ -100,6 +112,7 @@ const classification_body = `
 
         drawDonutChart(categoryDetails); // Draw the donut chart with the details
     });
+
 
     </script>
 </body>
