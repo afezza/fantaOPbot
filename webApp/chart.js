@@ -46,6 +46,8 @@ function drawDonutChart(details) {
     donutChart.data(donutData);
     donutChart.title('Dettaglio di ' + details.x);
 
+    donutChart.innerRadius("75%");
+
     // set the position of labels and format them
     donutChart.labels().format('{%value}{decimalsCount:1,zeroFillDecimals:true}');
     donutChart.labels().position("outside");
