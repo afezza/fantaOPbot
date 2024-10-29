@@ -9,12 +9,6 @@ columnChart.data(data);
 // Set the chart title
 columnChart.title('Classifica Fanta OP');
 
-// Set the x-axis title
-columnChart.xAxis().title('Squadre');
-
-// Set the y-axis title
-columnChart.yAxis().title('Punteggio');
-
 // Customize the column color
 columnChart.palette(['#7C00FE']); // Dark violet color
 
@@ -67,7 +61,7 @@ function drawDonutChart(details) {
 
     // Set data and title for the donut chart
     donutChart.data(donutData);
-    donutChart.title('Dettaglio di ' + details.x);
+    donutChart.title(details.x);
 
     donutChart.innerRadius("75%");
 

@@ -15,8 +15,10 @@ const classification_body = `
     <style>
         #column-container, #donut-container {
             width: 100%;
-            height: 400px;
-            margin-bottom: 20px;
+            height: 50vh;
+        }
+        body {
+            overflow: hidden; /* Hide both horizontal and vertical scrollbars */
         }
     </style>
 </head>
@@ -37,12 +39,6 @@ const classification_body = `
 
     // Set the chart title
     columnChart.title('Classifica Fanta OP');
-
-    // Set the x-axis title
-    columnChart.xAxis().title('Squadre');
-
-    // Set the y-axis title
-    columnChart.yAxis().title('Punteggio');
 
     // Customize the column color
     columnChart.palette(['#7C00FE']); // Dark violet color
@@ -96,7 +92,7 @@ const classification_body = `
 
         // Set data and title for the donut chart
         donutChart.data(donutData);
-        donutChart.title('Dettaglio di ' + details.x);
+        donutChart.title(details.x);
 
         donutChart.innerRadius("75%");
 
