@@ -10,7 +10,7 @@ const classification_body = `
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AnyChart Column and Donut Chart</title>
+    <title>Classifica Fanta OP </title>
     <script src="https://cdn.anychart.com/releases/8.10.0/js/anychart-bundle.min.js"></script>
     <style>
         #column-container, #donut-container {
@@ -151,57 +151,68 @@ const classification_body = `
 
 export const handler = async (event) => {
 
-    const command = new GetCommand({
-    TableName: "FantaOP",
-    Key: {
-        edition_key: "-1002194179581",
-    },
-    });
+    let body_text = '';
 
-    const db_entry = await docClient.send(command);
-    // console.log(db_entry); // TODO: is not working
-
-    // Create a list for the matches and the teams from db entry
-    let match_list = JSON.parse(db_entry['Item']['match_list']); 
-    let team_list = JSON.parse(db_entry['Item']['teams']);
-
-    let team_name_collection = {};
-    for (let team in team_list) //returns the index
+    if(event.rawPath === '/classification')
     {
-        team_name_collection[team_list[team]['team_id']] =
+        console.log("The user asked for classification");
+        const command = new GetCommand({
+            TableName: "FantaOP",
+            Key: {
+                edition_key: "-1002194179581",
+            },
+            });
+            console.log("Classification Handling");
+        
+            const db_entry = await docClient.send(command);
+            // console.log(db_entry); // TODO: is not working
+        
+            // Create a list for the matches and the teams from db entry
+            let match_list = JSON.parse(db_entry['Item']['match_list']); 
+            let team_list = JSON.parse(db_entry['Item']['teams']);
+        
+            let team_name_collection = {};
+            for (let team in team_list) //returns the index
             {
-            x: team_list[team]['team_name'],
-            value : 0.0,
-            details : {}
+                team_name_collection[team_list[team]['team_id']] =
+                    {
+                    x: team_list[team]['team_name'],
+                    value : 0.0,
+                    details : {}
+                    }
             }
+        
+            for (let match in match_list)
+            {
+                if(match_list[match]['state'] != "COMPLETED") {break;}
+            
+                for (let team in match_list[match]['squads'])
+                {   
+                    team_name_collection[match_list[match]['squads'][team]['team_id']]['details'][match_list[match]['chapter']] = match_list[match]['squads'][team]['total_score']
+                    team_name_collection[match_list[match]['squads'][team]['team_id']]['value'] += parseFloat(match_list[match]['squads'][team]['total_score'])
+                }
+            }
+            console.log(team_name_collection);
+        
+            let team_name_list = []
+            for (let team in team_name_collection)
+            {
+                team_name_list.push(team_name_collection[team]);
+            }
+            team_name_list.sort((a, b) => parseFloat(b.value) - parseFloat(a.value));
+            console.log(team_name_list);
+            let text_str = '';
+            text_str += JSON.stringify(team_name_list);
+        
+            // Put the data in the js code to send to the client
+            let text_query = "//COLUMN_DATA";
+            let index_data = classification_body.indexOf(text_query);
+            body_text = classification_body.slice(0, index_data) + text_str + classification_body.slice(index_data+text_query.length);        
     }
-
-    for (let match in match_list)
+    else if(event.rawPath === '/rank_verification')
     {
-        if(match_list[match]['state'] != "COMPLETED") {break;}
-    
-        for (let team in match_list[match]['squads'])
-        {   
-            team_name_collection[match_list[match]['squads'][team]['team_id']]['details'][match_list[match]['chapter']] = match_list[match]['squads'][team]['total_score']
-            team_name_collection[match_list[match]['squads'][team]['team_id']]['value'] += parseFloat(match_list[match]['squads'][team]['total_score'])
-        }
+        console.log("The user asked for rank verification");
     }
-    console.log(team_name_collection);
-
-    let team_name_list = []
-    for (let team in team_name_collection)
-    {
-        team_name_list.push(team_name_collection[team]);
-    }
-    team_name_list.sort((a, b) => parseFloat(b.value) - parseFloat(a.value));
-    console.log(team_name_list);
-    let text_str = '';
-    text_str += JSON.stringify(team_name_list);
-
-    // Put the data in the js code to send to the client
-    let text_query = "//COLUMN_DATA";
-    let index_data = classification_body.indexOf(text_query);
-    let body_text = classification_body.slice(0, index_data) + text_str + classification_body.slice(index_data+text_query.length);
 
     let response = {
         'statusCode': 200,
