@@ -18,16 +18,39 @@ const classification_body = `
             height: 50vh;
         }
         body {
-            overflow: hidden; /* Hide both horizontal and vertical scrollbars */
+            overflow-x: hidden;  /* Hide horizontal scrollbar */
+            overflow-y: auto;    /* Enable vertical scrollbar */
+            }
+        #button-container {
+            margin: 20px;
+            text-align: center;
+        }
+        button {
+            padding: 10px 20px;
+            margin: 0 10px;
+            font-size: 16px;
+            cursor: pointer;
         }
     </style>
 </head>
 <body>
+
+    <!-- Button container -->
+    <div id="button-container">
+        <button onclick="reloadToUrl('https://wj1r9bp4q4.execute-api.eu-north-1.amazonaws.com/classification?-22222222222222')">Fanta OP VIII</button>
+        <button onclick="reloadToUrl('https://wj1r9bp4q4.execute-api.eu-north-1.amazonaws.com/classification?-1002194179581')">Fanta OP IX</button>
+    </div>
+
     <div id="column-container"></div>
     <div id="donut-container"></div>
     
     <!-- <script src="chart.js"></script> -->
     <script>
+
+    // Function to reload the page to a specified URL
+    function reloadToUrl(url) {
+        window.location.href = url;  // This will reload the page to the specified URL
+    }
 
     const data = //COLUMN_DATA;
 
@@ -151,15 +174,21 @@ const classification_body = `
 
 export const handler = async (event) => {
 
+    console.log(event); 
+
     let body_text = '';
 
     if(event.rawPath === '/classification')
     {
-        console.log("The user asked for classification");
+        if (event.rawQueryString !== '-1002194179581' && event.rawQueryString !== '-22222222222222')
+        {
+            event.rawQueryString = '-1002194179581';
+        }
+        console.log("The user asked for classification for key" + event.rawQueryString);
         const command = new GetCommand({
             TableName: "FantaOP",
             Key: {
-                edition_key: "-1002194179581",
+                edition_key: event.rawQueryString,
             },
             });
             console.log("Classification Handling");
