@@ -60,12 +60,8 @@
 
     <div class="names-container">
         <h2>Names List</h2>
-        <ul class="names-list">
-            <li data-name="John">John</li>
-            <li data-name="Jane">Jane</li>
-            <li data-name="Michael">Michael</li>
-            <li data-name="Sarah">Sarah</li>
-            <li data-name="David">David</li>
+        <ul class="names-list" id="namesList">
+            <!-- Names will be dynamically inserted here -->
         </ul>
     </div>
 
@@ -73,11 +69,7 @@
         <h2>Select from Dropdown</h2>
         <select id="nameSelect" onchange="addNameToList()">
             <option value="">-- Select an item --</option>
-            <option value="Item 1">Item 1</option>
-            <option value="Item 2">Item 2</option>
-            <option value="Item 3">Item 3</option>
-            <option value="Item 4">Item 4</option>
-            <option value="Item 5">Item 5</option>
+            <!-- Dropdown items will be dynamically inserted here -->
         </select>
     </div>
 
@@ -85,6 +77,22 @@
         let selectedName = null;
         let selectedLi = null;
         const namesList = document.querySelector('.names-list');
+        const nameSelect = document.getElementById('nameSelect');
+
+        // The names list will come from here (replace with your actual data)
+        const names = ["John", "Jane", "Michael", "Sarah", "David"];
+
+        // The dropdown items collection (as per the new format)
+        const dropdownItems = {
+            "AppFl": {
+                "value": "4",
+                "description": "Appare in un Flashback"
+            },
+            "AppTag": {
+                "value": "7",
+                "description": "Appare in una taglia"
+            }
+        };
 
         // Track selected items for each name
         const nameAssociations = {
@@ -95,21 +103,32 @@
             David: []
         };
 
-        // Event listener for name clicks in the left list (Only main items can be selected with a single click)
+        // Dynamically populate the names list on the left
+        names.forEach(name => {
+            const li = document.createElement('li');
+            li.textContent = name;
+            li.setAttribute('data-name', name);
+            namesList.appendChild(li);
+        });
+
+        // Dynamically populate the dropdown items
+        Object.entries(dropdownItems).forEach(([key, item]) => {
+            const option = document.createElement('option');
+            option.value = item.value;
+            option.textContent = item.description;
+            nameSelect.appendChild(option);
+        });
+
+        // Event listener for name clicks in the left list
         namesList.addEventListener('click', function(e) {
             const clickedItem = e.target;
             
-            // Only allow selection of main names (not sub-elements)
             if (clickedItem.tagName.toLowerCase() === 'li' && !clickedItem.classList.contains('associated-item')) {
-                // Remove the "selected" class from all items
                 document.querySelectorAll('.names-list li').forEach(li => li.classList.remove('selected'));
-                
-                // Add the "selected" class to the clicked item
                 clickedItem.classList.add('selected');
                 
-                // Set the global selectedName to the clicked name
                 selectedName = clickedItem.getAttribute('data-name');
-                selectedLi = clickedItem; // Store the selected list item (for appending under it)
+                selectedLi = clickedItem;
 
                 // Update the dropdown based on the selected name
                 updateDropdown();
@@ -120,98 +139,78 @@
         namesList.addEventListener('dblclick', function(e) {
             const clickedItem = e.target;
             
-            // Only allow removal of sub-elements (associated items)
             if (clickedItem.tagName.toLowerCase() === 'li' && clickedItem.classList.contains('associated-item')) {
-                // Remove the associated item (sub-element)
                 clickedItem.remove();
 
-                // Re-enable the item in the dropdown (making it available again)
                 enableItemInDropdown(clickedItem.textContent);
 
-                // Remove from the nameAssociations
                 const index = nameAssociations[selectedName].indexOf(clickedItem.textContent);
                 if (index > -1) {
                     nameAssociations[selectedName].splice(index, 1);
                 }
 
-                // Update the dropdown again after removal
                 updateDropdown();
             }
         });
 
         function addNameToList() {
-            const selectedItem = document.getElementById("nameSelect").value;
+            const selectedItemValue = document.getElementById("nameSelect").value;
+            const selectedItemDesc = document.getElementById("nameSelect").selectedOptions[0].textContent;
 
-            // Check if both a name is selected and an item is chosen
-            if (selectedName && selectedItem) {
-                // Create a new list item to show the association
+            if (selectedName && selectedItemValue) {
                 const associatedLi = document.createElement("li");
-                associatedLi.textContent = `${selectedItem}`;
+                associatedLi.textContent = `${selectedItemDesc}`;
                 associatedLi.classList.add("associated-item");
                 
-                // Append it under the selected name
                 selectedLi.appendChild(associatedLi);
-                
-                // Add the selected item to the nameAssociations
-                nameAssociations[selectedName].push(selectedItem);
 
-                // Remove the selected item from the dropdown
-                removeItemFromDropdown(selectedItem);
-                
-                // Clear the dropdown after selection
+                nameAssociations[selectedName].push(selectedItemDesc);
+
+                removeItemFromDropdown(selectedItemDesc);
+
                 document.getElementById("nameSelect").value = "";
 
-                // Update the dropdown based on the selected name
                 updateDropdown();
             } else {
                 alert("Please select a name on the left and an item from the dropdown.");
             }
         }
 
-        function removeItemFromDropdown(item) {
-            const dropdown = document.getElementById("nameSelect");
-            const options = dropdown.options;
-
-            // Loop through options and remove the selected item
-            for (let i = 0; i < options.length; i++) {
-                if (options[i].value === item) {
-                    options[i].disabled = true; // Disable the selected item
-                    options[i].style.color = "gray"; // Optionally, change color to gray for disabled items
+        function removeItemFromDropdown(itemDescription) {
+            const options = nameSelect.options;
+            for (let i = 1; i < options.length; i++) {
+                if (options[i].textContent === itemDescription) {
+                    options[i].disabled = true;
+                    options[i].style.color = "gray";
                     break;
                 }
             }
         }
 
-        function enableItemInDropdown(itemName) {
-            const dropdown = document.getElementById("nameSelect");
-            const options = dropdown.options;
-
-            // Loop through options and re-enable the item
-            for (let i = 0; i < options.length; i++) {
-                if (options[i].value === itemName) {
-                    options[i].disabled = false; // Enable the item
-                    options[i].style.color = "black"; // Restore original color
+        function enableItemInDropdown(itemDescription) {
+            const options = nameSelect.options;
+            for (let i = 1; i < options.length; i++) {
+                if (options[i].textContent === itemDescription) {
+                    options[i].disabled = false;
+                    options[i].style.color = "black";
                     break;
                 }
             }
         }
 
         function updateDropdown() {
-            const dropdown = document.getElementById("nameSelect");
-            const options = dropdown.options;
+            const options = nameSelect.options;
 
-            // Enable all items in the dropdown first
             for (let i = 1; i < options.length; i++) {
                 options[i].disabled = false;
                 options[i].style.color = "black";
             }
 
-            // Disable items that have already been associated with the selected name
             nameAssociations[selectedName].forEach(item => {
                 for (let i = 1; i < options.length; i++) {
-                    if (options[i].value === item) {
+                    if (options[i].textContent === item) {
                         options[i].disabled = true;
-                        options[i].style.color = "gray"; // Optionally, change color to gray for disabled items
+                        options[i].style.color = "gray";
                     }
                 }
             });
