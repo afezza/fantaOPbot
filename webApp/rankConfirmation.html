@@ -31,6 +31,7 @@
             margin: 5px 0;
             background-color: #f0f0f0;
             border-radius: 4px;
+            position: relative;
         }
 
         .names-list li.selected {
@@ -44,6 +45,23 @@
             border-radius: 4px;
         }
 
+        /* Trash bin button styles */
+        .trash-bin {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            background-color: transparent;
+            border: none;
+            font-size: 16px;
+            cursor: pointer;
+            color: #888;
+        }
+
+        .trash-bin:hover {
+            color: #f44336;
+        }
+
         .dropdown-container {
             width: 45%;
         }
@@ -53,7 +71,6 @@
             padding: 8px;
             margin-bottom: 20px;
         }
-
     </style>
 </head>
 <body>
@@ -74,15 +91,15 @@
     </div>
 
     <script>
-        let selectedName = null;
-        let selectedLi = null;
+        let currentSelectedName = null;  // Track the name that is currently selected
+        let currentSelectedLi = null;    // The DOM element of the selected name
         const namesList = document.querySelector('.names-list');
         const nameSelect = document.getElementById('nameSelect');
 
-        // The names list will come from here (replace with your actual data)
+        // The names list will come from here
         const names = ["John", "Jane", "Michael", "Sarah", "David"];
 
-        // The dropdown items collection (as per the new format)
+        // The dropdown items collection
         const dropdownItems = {
             "AppFl": {
                 "value": "4",
@@ -107,7 +124,7 @@
         names.forEach(name => {
             const li = document.createElement('li');
             li.textContent = name;
-            li.setAttribute('data-name', name);
+            li.setAttribute('data-name', name);  // Set the data-name attribute
             namesList.appendChild(li);
         });
 
@@ -122,33 +139,56 @@
         // Event listener for name clicks in the left list
         namesList.addEventListener('click', function(e) {
             const clickedItem = e.target;
-            
-            if (clickedItem.tagName.toLowerCase() === 'li' && !clickedItem.classList.contains('associated-item')) {
-                document.querySelectorAll('.names-list li').forEach(li => li.classList.remove('selected'));
-                clickedItem.classList.add('selected');
-                
-                selectedName = clickedItem.getAttribute('data-name');
-                selectedLi = clickedItem;
 
-                // Update the dropdown based on the selected name
-                updateDropdown();
+            // Ensure that the clicked item is not an associated item
+            if (clickedItem.tagName.toLowerCase() === 'li' && !clickedItem.classList.contains('associated-item')) {
+                // Check if the clicked item is the same as the selected item
+                if (currentSelectedLi !== clickedItem) {
+                    // Clear selection for all list items
+                    document.querySelectorAll('.names-list li').forEach(li => li.classList.remove('selected'));
+
+                    // Mark the clicked item as selected
+                    clickedItem.classList.add('selected');
+                    
+                    currentSelectedName = clickedItem.getAttribute('data-name');  // Update currentSelectedName
+                    currentSelectedLi = clickedItem;  // Keep reference to the clicked li
+
+                    // Update dropdown to reflect current selection
+                    updateDropdown();
+                }
             }
         });
 
-        // Event listener for removing associated items (sub-elements) on double click
-        namesList.addEventListener('dblclick', function(e) {
-            const clickedItem = e.target;
-            
-            if (clickedItem.tagName.toLowerCase() === 'li' && clickedItem.classList.contains('associated-item')) {
-                clickedItem.remove();
+        // Event listener for removing associated items (sub-elements) using the trash button
+        namesList.addEventListener('click', function(e) {
+            // Check if the clicked element is a trash bin button
+            if (e.target && e.target.classList.contains('trash-bin')) {
+                const trashBin = e.target;  // The trash button itself
+                const associatedLi = trashBin.parentElement;  // The li that the trash bin belongs to
 
-                enableItemInDropdown(clickedItem.textContent);
+                // Get the associated name from the li's data-associated-name attribute
+                const associatedName = associatedLi.getAttribute('data-associated-name');
+                console.log(`Deleting item from "${associatedName}"`);
 
-                const index = nameAssociations[selectedName].indexOf(clickedItem.textContent);
+                // Remove the associated item
+                associatedLi.remove();
+
+                // Get the text content of the removed item
+                const itemText = associatedLi.textContent.replace('🗑️', '').trim();  // Remove the trash icon from text
+
+                // Remove from nameAssociations for the associated name
+                const index = nameAssociations[associatedName].indexOf(itemText);
                 if (index > -1) {
-                    nameAssociations[selectedName].splice(index, 1);
+                    nameAssociations[associatedName].splice(index, 1);
                 }
 
+                // Re-enable the item in the dropdown
+                enableItemInDropdown(itemText);
+
+                // Print updated associations
+                console.log(`Updated associations for ${associatedName}:`, nameAssociations[associatedName]);
+
+                // Update dropdown
                 updateDropdown();
             }
         });
@@ -157,17 +197,38 @@
             const selectedItemValue = document.getElementById("nameSelect").value;
             const selectedItemDesc = document.getElementById("nameSelect").selectedOptions[0].textContent;
 
-            if (selectedName && selectedItemValue) {
+            if (currentSelectedName && selectedItemValue) {
+                // Check if the item is already added
+                if (nameAssociations[currentSelectedName].includes(selectedItemDesc)) {
+                    alert("This item has already been added.");
+                    return;
+                }
+
+                // Create a new associated item and append to the selected name's list
                 const associatedLi = document.createElement("li");
                 associatedLi.textContent = `${selectedItemDesc}`;
+
+                // Add the associated name as a custom attribute to the li
+                associatedLi.setAttribute('data-associated-name', currentSelectedName);
+
+                // Create a trash bin button and append it to the associated item
+                const trashBin = document.createElement('button');
+                trashBin.textContent = '🗑️';  // Trash bin icon
+                trashBin.classList.add('trash-bin');
+                associatedLi.appendChild(trashBin);
+
                 associatedLi.classList.add("associated-item");
-                
-                selectedLi.appendChild(associatedLi);
 
-                nameAssociations[selectedName].push(selectedItemDesc);
+                // Add the associated item to the selected name's list
+                currentSelectedLi.appendChild(associatedLi);
 
+                // Add to the selected name's associations
+                nameAssociations[currentSelectedName].push(selectedItemDesc);
+
+                // Update dropdown state to disable the selected item for this name
                 removeItemFromDropdown(selectedItemDesc);
 
+                // Clear the dropdown after selection
                 document.getElementById("nameSelect").value = "";
 
                 updateDropdown();
@@ -201,19 +262,24 @@
         function updateDropdown() {
             const options = nameSelect.options;
 
+            // Re-enable all options before updating
             for (let i = 1; i < options.length; i++) {
                 options[i].disabled = false;
                 options[i].style.color = "black";
             }
 
-            nameAssociations[selectedName].forEach(item => {
-                for (let i = 1; i < options.length; i++) {
-                    if (options[i].textContent === item) {
-                        options[i].disabled = true;
-                        options[i].style.color = "gray";
+            // Disable items already selected for the current name
+            if (currentSelectedName) {
+                nameAssociations[currentSelectedName].forEach(item => {
+                    for (let i = 1; i < options.length; i++) {
+                        if (options[i].textContent === item) {
+                            options[i].disabled = true;
+                            options[i].style.color = "gray";
+                            break;
+                        }
                     }
-                }
-            });
+                });
+            }
         }
     </script>
 
