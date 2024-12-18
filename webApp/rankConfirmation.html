@@ -76,9 +76,9 @@
 <body>
 
     <div class="names-container">
-        <h2>Names List</h2>
+        <h2>Players List</h2>
         <ul class="names-list" id="namesList">
-            <!-- Names will be dynamically inserted here -->
+            <!-- Players will be dynamically inserted here -->
         </ul>
     </div>
 
@@ -96,8 +96,11 @@
         const namesList = document.querySelector('.names-list');
         const nameSelect = document.getElementById('nameSelect');
 
-        // The names list will come from here
-        const names = ["John", "Jane", "Michael", "Sarah", "David"];
+        // Players array based on the new format
+        const players = [
+            { "name": "Denjiro", "role": "1° riserva", "score": {} },
+            { "name": "Jinbe", "role": "Capitano", "score": { "AppUltPag": "1", "App": "3" } }
+        ];
 
         // The dropdown items collection (mapping key to description)
         const dropdownItems = {
@@ -108,24 +111,24 @@
             "AppTag": {
                 "value": "7",
                 "description": "Appare in una taglia"
+            },
+            "AppUltPag": {
+                "value": "1",
+                "description": "Appare nell'ultima pagina"
+            },
+            "App": {
+                "value": "3",
+                "description": "Il personaggio appare"
             }
         };
 
-        // Track selected items for each name (map the name to associated items using keys)
-        const nameAssociations = {
-            John: [],
-            Jane: [],
-            Michael: [],
-            Sarah: [],
-            David: []
-        };
-
-        // Dynamically populate the names list on the left
-        names.forEach(name => {
+        // Dynamically populate the players list on the left
+        players.forEach(player => {
             const li = document.createElement('li');
-            li.textContent = name;
-            li.setAttribute('data-name', name);  // Set the data-name attribute
+            li.textContent = player.name + " (" + player.role + ")";
+            li.setAttribute('data-name', player.name);  // Set the data-name attribute
             namesList.appendChild(li);
+            addScoresToList(player.name);
         });
 
         // Dynamically populate the dropdown items
@@ -174,11 +177,8 @@
 
                 console.log(`Deleting item from "${associatedName}"`);
 
-                // Remove the associated item from the name's array of Maps
-                const index = nameAssociations[associatedName].findIndex(map => map.has(associatedItemKey));
-                if (index > -1) {
-                    nameAssociations[associatedName][index].delete(associatedItemKey);
-                }
+                // Remove the associated item from the player's score map
+                delete players.find(player => player.name === associatedName).score[associatedItemKey];
 
                 // Remove the associated item from the DOM
                 associatedLi.remove();
@@ -187,26 +187,66 @@
                 enableItemInDropdown(associatedItemKey);
 
                 // Print updated associations
-                console.log(`Updated associations for ${associatedName}:`, nameAssociations[associatedName]);
+                console.log(`Updated score for ${associatedName}:`, players.find(player => player.name === associatedName).score);
 
                 // Update dropdown
                 updateDropdown();
             }
         });
 
+        function addScoresToList(playerName) {
+            // Find the player object by name
+            const player = players.find(player => player.name === playerName);
+
+            // If the player exists and they have scores
+            if (player && player.score) {
+                const playerScores = player.score;
+
+                // Find the corresponding player list in the DOM (if applicable)
+                const playerLi = document.querySelector(`[data-name="${playerName}"]`);
+
+                if (playerLi) {
+                    // Iterate over each key-value pair in the player's score object
+                    Object.entries(playerScores).forEach(([key, value]) => {
+                        // Check if the score value exists in dropdownItems
+                        const itemDescription = dropdownItems[key] ? dropdownItems[key].description : 'Unknown Item';
+                        
+                        // Create a new <li> element for each score
+                        const scoreLi = document.createElement('li');
+                        scoreLi.textContent = itemDescription;
+
+                        // Add data attributes for the associated name and key
+                        scoreLi.setAttribute('data-associated-name', playerName);
+                        scoreLi.setAttribute('data-associated-key', key);
+
+                        // Add the "associated-item" class
+                        scoreLi.classList.add('associated-item');
+
+                        // Create a trash bin button to allow removal of the score
+                        const trashBin = document.createElement('button');
+                        trashBin.textContent = '🗑️';  // Trash bin icon
+                        trashBin.classList.add('trash-bin');
+                        scoreLi.appendChild(trashBin);
+
+                        // Append the new <li> to the player's <li> container in the DOM
+                        playerLi.appendChild(scoreLi);
+                    });
+                }
+            }
+}
         function addNameToList() {
             const selectedItemValue = document.getElementById("nameSelect").value;
             const selectedItemKey = document.getElementById("nameSelect").selectedOptions[0].getAttribute('data-key');  // Get the key of the selected item
 
             if (currentSelectedName && selectedItemValue) {
-                // Check if the item is already added using the key (check Map inside the array)
-                const existingMap = nameAssociations[currentSelectedName].find(map => map.has(selectedItemKey));
-                if (existingMap) {
+                // Check if the item is already added to the player's score map
+                const player = players.find(p => p.name === currentSelectedName);
+                if (player.score[selectedItemKey]) {
                     alert("This item has already been added.");
                     return;
                 }
 
-                // Create a new associated item and append to the selected name's list
+                // Create a new associated item and append to the selected player's list
                 const associatedLi = document.createElement("li");
                 associatedLi.textContent = dropdownItems[selectedItemKey].description;
 
@@ -222,26 +262,23 @@
 
                 associatedLi.classList.add("associated-item");
 
-                // If there is no map for the selected name, create one
-                if (nameAssociations[currentSelectedName].length === 0) {
-                    nameAssociations[currentSelectedName].push(new Map());
-                }
+                // Add the associated item to the selected player's score map
+                players.find(player => player.name === currentSelectedName).score[selectedItemKey] = dropdownItems[selectedItemKey].value;
 
-                // Add the associated item to the selected name's Map
-                nameAssociations[currentSelectedName][0].set(selectedItemKey, dropdownItems[selectedItemKey]);
-
-                // Add the associated item to the selected name's list in the DOM
+                // Add the associated item to the selected player's list in the DOM
                 currentSelectedLi.appendChild(associatedLi);
 
-                // Update dropdown state to disable the selected item for this name
+                // Update dropdown state to disable the selected item for this player
                 removeItemFromDropdown(selectedItemKey);
 
                 // Clear the dropdown after selection
                 document.getElementById("nameSelect").value = "";
 
                 updateDropdown();
+                console.log(`Updated score for ${currentSelectedName}:`, players.find(player => player.name === currentSelectedName).score);
+
             } else {
-                alert("Please select a name on the left and an item from the dropdown.");
+                alert("Please select a player on the left and an item from the dropdown.");
             }
         }
 
@@ -254,7 +291,7 @@
                     break;
                 }
             }
-            console.log(nameAssociations);
+            console.log(players);
         }
 
         function enableItemInDropdown(itemKey) {
@@ -277,18 +314,17 @@
                 options[i].style.color = "black";
             }
 
-            // Disable items already selected for the current name using key
+            // Disable items already selected for the current player using key
             if (currentSelectedName) {
-                nameAssociations[currentSelectedName].forEach(map => {
-                    map.forEach((value, key) => {
-                        for (let i = 1; i < options.length; i++) {
-                            if (options[i].getAttribute('data-key') === key) {
-                                options[i].disabled = true;
-                                options[i].style.color = "gray";
-                                break;
-                            }
+                const player = players.find(p => p.name === currentSelectedName);
+                Object.keys(player.score).forEach(key => {
+                    for (let i = 1; i < options.length; i++) {
+                        if (options[i].getAttribute('data-key') === key) {
+                            options[i].disabled = true;
+                            options[i].style.color = "gray";
+                            break;
                         }
-                    });
+                    }
                 });
             }
         }
