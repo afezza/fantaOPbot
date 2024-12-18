@@ -99,7 +99,7 @@
         // The names list will come from here
         const names = ["John", "Jane", "Michael", "Sarah", "David"];
 
-        // The dropdown items collection
+        // The dropdown items collection (mapping key to description)
         const dropdownItems = {
             "AppFl": {
                 "value": "4",
@@ -111,7 +111,7 @@
             }
         };
 
-        // Track selected items for each name
+        // Track selected items for each name (map the name to associated items using keys)
         const nameAssociations = {
             John: [],
             Jane: [],
@@ -133,6 +133,7 @@
             const option = document.createElement('option');
             option.value = item.value;
             option.textContent = item.description;
+            option.setAttribute('data-key', key);  // Set the data-key attribute to map it
             nameSelect.appendChild(option);
         });
 
@@ -168,22 +169,22 @@
 
                 // Get the associated name from the li's data-associated-name attribute
                 const associatedName = associatedLi.getAttribute('data-associated-name');
+                const associatedItemKey = associatedLi.getAttribute('data-associated-key');
+                const associatedItemDesc = dropdownItems[associatedItemKey].description;
+
                 console.log(`Deleting item from "${associatedName}"`);
 
-                // Remove the associated item
-                associatedLi.remove();
-
-                // Get the text content of the removed item
-                const itemText = associatedLi.textContent.replace('🗑️', '').trim();  // Remove the trash icon from text
-
-                // Remove from nameAssociations for the associated name
-                const index = nameAssociations[associatedName].indexOf(itemText);
+                // Remove the associated item from the name's array of Maps
+                const index = nameAssociations[associatedName].findIndex(map => map.has(associatedItemKey));
                 if (index > -1) {
-                    nameAssociations[associatedName].splice(index, 1);
+                    nameAssociations[associatedName][index].delete(associatedItemKey);
                 }
 
+                // Remove the associated item from the DOM
+                associatedLi.remove();
+
                 // Re-enable the item in the dropdown
-                enableItemInDropdown(itemText);
+                enableItemInDropdown(associatedItemKey);
 
                 // Print updated associations
                 console.log(`Updated associations for ${associatedName}:`, nameAssociations[associatedName]);
@@ -195,21 +196,23 @@
 
         function addNameToList() {
             const selectedItemValue = document.getElementById("nameSelect").value;
-            const selectedItemDesc = document.getElementById("nameSelect").selectedOptions[0].textContent;
+            const selectedItemKey = document.getElementById("nameSelect").selectedOptions[0].getAttribute('data-key');  // Get the key of the selected item
 
             if (currentSelectedName && selectedItemValue) {
-                // Check if the item is already added
-                if (nameAssociations[currentSelectedName].includes(selectedItemDesc)) {
+                // Check if the item is already added using the key (check Map inside the array)
+                const existingMap = nameAssociations[currentSelectedName].find(map => map.has(selectedItemKey));
+                if (existingMap) {
                     alert("This item has already been added.");
                     return;
                 }
 
                 // Create a new associated item and append to the selected name's list
                 const associatedLi = document.createElement("li");
-                associatedLi.textContent = `${selectedItemDesc}`;
+                associatedLi.textContent = dropdownItems[selectedItemKey].description;
 
                 // Add the associated name as a custom attribute to the li
                 associatedLi.setAttribute('data-associated-name', currentSelectedName);
+                associatedLi.setAttribute('data-associated-key', selectedItemKey);
 
                 // Create a trash bin button and append it to the associated item
                 const trashBin = document.createElement('button');
@@ -219,14 +222,19 @@
 
                 associatedLi.classList.add("associated-item");
 
-                // Add the associated item to the selected name's list
+                // If there is no map for the selected name, create one
+                if (nameAssociations[currentSelectedName].length === 0) {
+                    nameAssociations[currentSelectedName].push(new Map());
+                }
+
+                // Add the associated item to the selected name's Map
+                nameAssociations[currentSelectedName][0].set(selectedItemKey, dropdownItems[selectedItemKey]);
+
+                // Add the associated item to the selected name's list in the DOM
                 currentSelectedLi.appendChild(associatedLi);
 
-                // Add to the selected name's associations
-                nameAssociations[currentSelectedName].push(selectedItemDesc);
-
                 // Update dropdown state to disable the selected item for this name
-                removeItemFromDropdown(selectedItemDesc);
+                removeItemFromDropdown(selectedItemKey);
 
                 // Clear the dropdown after selection
                 document.getElementById("nameSelect").value = "";
@@ -237,21 +245,22 @@
             }
         }
 
-        function removeItemFromDropdown(itemDescription) {
+        function removeItemFromDropdown(itemKey) {
             const options = nameSelect.options;
             for (let i = 1; i < options.length; i++) {
-                if (options[i].textContent === itemDescription) {
+                if (options[i].getAttribute('data-key') === itemKey) {
                     options[i].disabled = true;
                     options[i].style.color = "gray";
                     break;
                 }
             }
+            console.log(nameAssociations);
         }
 
-        function enableItemInDropdown(itemDescription) {
+        function enableItemInDropdown(itemKey) {
             const options = nameSelect.options;
             for (let i = 1; i < options.length; i++) {
-                if (options[i].textContent === itemDescription) {
+                if (options[i].getAttribute('data-key') === itemKey) {
                     options[i].disabled = false;
                     options[i].style.color = "black";
                     break;
@@ -268,16 +277,18 @@
                 options[i].style.color = "black";
             }
 
-            // Disable items already selected for the current name
+            // Disable items already selected for the current name using key
             if (currentSelectedName) {
-                nameAssociations[currentSelectedName].forEach(item => {
-                    for (let i = 1; i < options.length; i++) {
-                        if (options[i].textContent === item) {
-                            options[i].disabled = true;
-                            options[i].style.color = "gray";
-                            break;
+                nameAssociations[currentSelectedName].forEach(map => {
+                    map.forEach((value, key) => {
+                        for (let i = 1; i < options.length; i++) {
+                            if (options[i].getAttribute('data-key') === key) {
+                                options[i].disabled = true;
+                                options[i].style.color = "gray";
+                                break;
+                            }
                         }
-                    }
+                    });
                 });
             }
         }
