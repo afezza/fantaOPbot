@@ -205,6 +205,7 @@ def retrieve_rank_from_app(key:str,db_entry):
     # Create a list for the matches and the teams from db entry
     match_list = json.loads(db_entry['Item']['match_list']) 
     team_list = json.loads(db_entry['Item']['teams']) 
+    rank_list = json.loads(db_entry['Item']['point_list']) 
 
     team_name_list = {}
     for team in team_list:
@@ -257,7 +258,8 @@ def retrieve_rank_from_app(key:str,db_entry):
                         player['score'] = {}
                         for j in range(len(vote_score_res[i])-1):
                             name = vote_score_res[i][j][0].text.split()[0]
-                            rank = vote_score_res[i][j][0].text.split()[1].replace('(','').replace(')','')
+                            # rank = vote_score_res[i][j][0].text.split()[1].replace('(','').replace(')','')
+                            rank = rank_list[name]['value']
                             player['score'][name] = rank
                             if(player['role'] == "Capitano"):
                                 rank = str(float(rank) * 2)
