@@ -8,6 +8,7 @@
         body {
             font-family: Arial, sans-serif;
             padding: 20px;
+            position: relative;
         }
 
         /* Tab Panel Styles */
@@ -17,7 +18,7 @@
             margin-bottom: 20px;
             cursor: pointer;
             border-bottom: 2px solid #ccc;
-            margin-left: 0;  /* Align to the left */
+            margin-left: 0;
         }
 
         .tab-item {
@@ -97,9 +98,29 @@
             padding: 8px;
             margin-bottom: 20px;
         }
+
+        /* Log and Copy JSON button */
+        #logAndCopyButton {
+            position: absolute;
+            right: 20px;
+            top: 20px;
+            padding: 10px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        #logAndCopyButton:hover {
+            background-color: #45a049;
+        }
     </style>
 </head>
 <body>
+
+    <!-- Add the button to the top right -->
+    <button id="logAndCopyButton">Log and Copy JSON</button>
 
     <!-- Tab Panel -->
     <div class="tab-panel" id="tabPanel">
@@ -240,7 +261,20 @@
             updateSelectedPlayer();
             updateScoresList();
         }
-        
+
+        // Function to log and copy JSON to clipboard
+        document.getElementById('logAndCopyButton').addEventListener('click', function() {
+            const chaptersJson = JSON.stringify(chapters, null, 2); // Convert chapters array to pretty JSON format
+            console.log(chaptersJson); // Log to the console
+
+            // Copy to clipboard
+            navigator.clipboard.writeText(chaptersJson).then(() => {
+                alert('Chapters JSON copied to clipboard!');
+            }).catch(err => {
+                console.error('Error copying to clipboard:', err);
+            });
+        });
+
         function updatePlayersDropdown(){
             
             const chapter = chapters[currentChapterIndex];
