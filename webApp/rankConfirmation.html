@@ -334,7 +334,7 @@
                 currentSelectedLi = playerLi;  // Keep reference to the clicked li
                 currentSelectedTeam = playerLi.getAttribute('team-id');
                 // Update dropdown to reflect current selection
-                updateDropdown();
+                updateScoresDropdown();
             } else {
                 currentSelectedPlayer = null; // Reset if no player is selected
             }
@@ -445,12 +445,13 @@
                 // Clear the dropdown after selection
                 document.getElementById("scoreSelect").value = "";
 
-                updateDropdown();
+                updateScoresDropdown();
                 updateScoresList();
                 updateSelectedPlayer();
                 console.log(`Updated score for ${currentSelectedPlayer}:`, chapters[currentChapterIndex].squads.find(teamData => teamData.team_id === currentSelectedTeam).players.find(player => player.name === currentSelectedPlayer).score);
 
             } else {
+                updateScoresList();
                 alert("Please select a player on the left and an item from the dropdown.");
             }
         }
@@ -478,7 +479,7 @@
             }
         }
 
-        function updateDropdown() {
+        function updateScoresDropdown() {
             const options = scoreSelect.options;
 
             // Re-enable all options before updating
