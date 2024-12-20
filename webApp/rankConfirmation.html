@@ -7,26 +7,52 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            display: flex;
-            justify-content: space-between;
             padding: 20px;
         }
 
-        .names-container {
+        /* Tab Panel Styles */
+        .tab-panel {
+            display: flex;
+            justify-content: flex-start;
+            margin-bottom: 20px;
+            cursor: pointer;
+            border-bottom: 2px solid #ccc;
+            margin-left: 0;  /* Align to the left */
+        }
+
+        .tab-item {
+            padding: 10px;
+            background-color: #f0f0f0;
+            border-radius: 4px;
+            margin-right: 10px;
+            transition: background-color 0.3s;
+        }
+
+        .tab-item:hover, .tab-item.active {
+            background-color: #b3d9ff;
+        }
+
+        /* Container Layout */
+        .container {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .list-container {
             width: 45%;
         }
 
-        .names-container h2 {
+        .list-container h2 {
             margin-bottom: 10px;
         }
 
-        .names-list {
+        .scores-list {
             list-style-type: none;
             padding: 0;
             cursor: pointer;
         }
 
-        .names-list li {
+        .scores-list li {
             padding: 8px;
             margin: 5px 0;
             background-color: #f0f0f0;
@@ -34,7 +60,7 @@
             position: relative;
         }
 
-        .names-list li.selected {
+        .scores-list li.selected {
             background-color: #b3d9ff;
         }
 
@@ -75,39 +101,89 @@
 </head>
 <body>
 
-    <div class="names-container">
-        <h2>Players List</h2>
-        <ul class="names-list" id="namesList">
-            <!-- Players will be dynamically inserted here -->
-        </ul>
+    <!-- Tab Panel -->
+    <div class="tab-panel" id="tabPanel">
+        <!-- Dynamic tabs will be inserted here -->
     </div>
 
-    <div class="dropdown-container">
-        <h2>Select from Dropdown</h2>
-        <select id="nameSelect" onchange="addNameToList()">
-            <option value="">-- Select an item --</option>
-            <!-- Dropdown items will be dynamically inserted here -->
-        </select>
+    <div class="container">
+        <div class="list-container">
+            <!-- This will dynamically display "Chapter [chapter number]" -->
+            <h2 id="chapterTitle">Loading...</h2>
+            <ul class="scores-list" id="scoresList">
+                <!-- Players will be dynamically inserted here -->
+            </ul>
+        </div>
+
+        <div class="dropdown-container">
+            <!-- New dropdown to select a player for the current chapter -->
+            <h2>Select Player</h2>
+            <select id="playerSelect" onchange="updateSelectedPlayer()">
+                <option value="">-- Select a Player --</option>
+                <!-- Player options will be dynamically inserted here -->
+            </select>
+
+            <h2>Select Points</h2>
+            <select id="scoreSelect" onchange="addNameToList()">
+                <option value="">-- Select an item --</option>
+                <!-- Dropdown items will be dynamically inserted here -->
+            </select>
+        </div>
     </div>
 
     <script>
-        let currentSelectedName = null;  // Track the name that is currently selected
-        let currentSelectedTeam = null;  // Track the name that is currently selected
-        let currentSelectedLi = null;    // The DOM element of the selected name
-        const namesList = document.querySelector('.names-list');
-        const nameSelect = document.getElementById('nameSelect');
+        // The chapters array, which holds the data
+        const chapters = [
+            {
+                "chapter": "1133",
+                "state": "COMPLETED",
+                "squads": [
+                    {
+                        "team_id": "9346",
+                        "total_score": "17.0",
+                        "players": [
+                            { "name": "Denjiro", "role": "1° riserva", "score": {} },
+                            { "name": "Jinbe", "role": "Vice", "score": { "AppUltPag": "1", "App": "3" } }
+                        ]
+                    },
+                    {
+                        "team_id": "9034",
+                        "total_score": "49.0",
+                        "players": [
+                            { "name": "Barbanera", "role": "Titolare", "score": {} },
+                            { "name": "Bibi", "role": "Titolare", "score": {} },
+                            { "name": "Brogy", "role": "Capitano", "score": { "App": "3", "Ride": "3" } }
+                        ]
+                    }
+                ]
+            },
+            {
+                "chapter": "1134",
+                "state": "WAIT_RANKING",
+                "squads": [
+                    {
+                        "team_id": "9347",
+                        "total_score": "10.0",
+                        "players": [
+                            { "name": "Luffy", "role": "Titolare", "score": {} },
+                            { "name": "Zoro", "role": "Capitano", "score": {} }
+                        ]
+                    }
+                ]
+            }
+        ];
 
-        // Players array based on the new format
-        const chapters = [{"chapter":"1133","state":"COMPLETED",
-                        "squads":[{
-                            "team_id":"9346","total_score":"17.0","players":[{"name":"Denjiro","role":"1° riserva","score":{}},{"name":"Jinbe","role":"Capitano","score":{"AppUltPag":"1","App":"3"}}]},
-                            {"team_id":"9034","total_score":"49.0","players":[{"name":"Barbanera","role":"Titolare","score":{}},{"name":"Bibi","role":"Titolare","score":{}},{"name":"Brogy","role":"Capitano","score":{"App":"3","Ride":"3"}}]}
-                        ]},
-                        {"chapter":"1134","state":"IN_PROGRESS",
-                        "squads":[{"team_id":"9347","total_score":"10.0","players":[{"name":"Luffy","role":"Titolare","score":"None"},{"name":"Zoro","role":"Capitano","score":{"App":"3","Ride":"2"}}]}]}];
+        let currentSelectedPlayer = null;
+        let currentSelectedTeam = null;
+        let currentSelectedLi = null;
+        let currentChapterIndex = chapters.length - 1; // Start with the last chapter
+        const scoresList = document.querySelector('.scores-list');
+        const scoreSelect = document.getElementById('scoreSelect');
+        const playerSelect = document.getElementById('playerSelect');
+        const tabPanel = document.getElementById('tabPanel');
+        const chapterTitle = document.getElementById('chapterTitle'); // Reference to the chapter title
 
-                            console.log(chapters);
-        // The dropdown items collection (mapping key to description)
+        // Dropdown Items
         const dropdownItems = {
             "AppFl": {
                 "value": "4",
@@ -127,79 +203,157 @@
             }
         };
 
-        // Create a new <li> element for the team_id
-        chapters[0].squads.forEach(teamData=>{
-            const teamDiv = document.createElement('div');
-            teamDiv.textContent = `Team ID: ${teamData.team_id} | Total Score: ${teamData.total_score}`;
-            teamDiv.setAttribute('team-id', teamData.team_id); 
-            namesList.appendChild(teamDiv);
+        // Function to populate chapter tabs
+        function createTabs() {
+            chapters.forEach((chapter, index) => {
+                const tabItem = document.createElement('div');
+                tabItem.classList.add('tab-item');
+                tabItem.textContent = `Chapter ${chapter.chapter}`;
+                tabItem.setAttribute('data-index', index);
 
-            const teamLi = document.createElement('li');
-            teamLi.textContent = `Team ID: ${teamData.team_id} | Total Score: ${teamData.total_score}`;
-            teamLi.classList.add('team-item'); 
-            teamDiv.appendChild(teamLi);
-    
-            // Dynamically populate the players list on the left
-            teamData.players.forEach(player => {
-                const li = document.createElement('li');
-                li.textContent = player.name + " (" + player.role + ")";
-                li.setAttribute('data-name', player.name);  // Set the data-name attribute
-                li.setAttribute('team-id', teamData.team_id);  // Set the team-id attribute to map it
-                teamDiv.appendChild(li);
-                addScoresToList(player.name, teamData.team_id);
-            });
-        });
-
-        // Dynamically populate the dropdown items
-        Object.entries(dropdownItems).forEach(([key, item]) => {
-            const option = document.createElement('option');
-            option.value = item.value;
-            option.textContent = item.description;
-            option.setAttribute('data-key', key);  // Set the data-key attribute to map it
-            nameSelect.appendChild(option);
-        });
-
-        // Event listener for name clicks in the left list
-        namesList.addEventListener('click', function(e) {
-            const clickedItem = e.target;
-
-            // Ensure that the clicked item is not an associated item
-            if (clickedItem.tagName.toLowerCase() === 'li' && !clickedItem.classList.contains('associated-item')) {
-                // Check if the clicked item is the same as the selected item
-                if (currentSelectedLi !== clickedItem) {
-                    // Clear selection for all list items
-                    document.querySelectorAll('.names-list li').forEach(li => li.classList.remove('selected'));
-
-                    // Mark the clicked item as selected
-                    clickedItem.classList.add('selected');
-                    
-                    currentSelectedName = clickedItem.getAttribute('data-name');  // Update currentSelectedName
-                    currentSelectedLi = clickedItem;  // Keep reference to the clicked li
-                    currentSelectedTeam = clickedItem.getAttribute('team-id');
-                    // Update dropdown to reflect current selection
-                    updateDropdown();
+                // Set the first tab as active by default
+                if (index === currentChapterIndex) {
+                    tabItem.classList.add('active');
                 }
-            }
-        });
 
-        // Event listener for removing associated items (sub-elements) using the trash button
-        namesList.addEventListener('click', function(e) {
-            // Check if the clicked element is a trash bin button
+                tabItem.addEventListener('click', () => selectChapter(index));
+                tabPanel.appendChild(tabItem);
+            });
+        }
+
+        // Function to handle selecting a chapter
+        function selectChapter(index) {
+            // Update the active tab
+            document.querySelectorAll('.tab-item').forEach(tab => tab.classList.remove('active'));
+            document.querySelector(`.tab-item[data-index="${index}"]`).classList.add('active');
+
+            // Update the current chapter index
+            currentChapterIndex = index;
+
+            // Update chapter title dynamically
+            chapterTitle.textContent = `Chapter ${chapters[index].chapter}`;
+
+            // Update the player list for the selected chapter
+            updatePlayersDropdown();
+            updateSelectedPlayer();
+            updateScoresList();
+        }
+        
+        function updatePlayersDropdown(){
+            
+            const chapter = chapters[currentChapterIndex];
+
+            playerSelect.innerHTML = '<option value="">-- Select a Player --</option>'; // Clear the player dropdown
+
+            chapter.squads.forEach(teamData => {
+                teamData.players.forEach(player => {
+                    // Add players to the player dropdown
+                    const playerOption = document.createElement('option');
+                    playerOption.value = player.name;
+                    playerOption.textContent = player.name;
+                    playerSelect.appendChild(playerOption);
+                });
+            });
+        }
+
+        // Function to update the player list and dropdown for the selected chapter
+        function updateScoresList() {
+            const chapter = chapters[currentChapterIndex];
+
+            // Clear the existing content
+            scoresList.innerHTML = '';
+            scoreSelect.innerHTML = '<option value="">-- Select an item --</option>';
+
+            // Populate the names list
+            chapter.squads.forEach(teamData => {
+                const teamDiv = document.createElement('div');
+                teamDiv.textContent = `Team ID: ${teamData.team_id} | Total Score: ${calculateTotalScore(teamData.players)} `;
+                teamDiv.setAttribute('team-id', teamData.team_id);
+                scoresList.appendChild(teamDiv);
+
+                teamData.players.forEach(player => {
+                    const li = document.createElement('li');
+                    li.textContent = player.name + " (" + player.role + ")";
+                    li.setAttribute('data-name', player.name);
+                    li.setAttribute('team-id', teamData.team_id);
+                    teamDiv.appendChild(li);
+                    addScoresToList(player.name, teamData.team_id);
+                });
+            });
+
+            // Populate the scores dropdown
+            Object.entries(dropdownItems).forEach(([key, item]) => {
+                const option = document.createElement('option');
+                option.value = item.value;
+                option.textContent = item.description;
+                option.setAttribute('data-key', key);
+                scoreSelect.appendChild(option);
+            });
+        }
+
+        // Function to calculate the total score for a team
+        function calculateTotalScore(players) {
+            let totalScore = 0;
+
+            players.forEach(player => {
+                Object.entries(player.score).forEach(([key, value]) => {
+                    if (dropdownItems[key]) {
+                        let scoreValue = parseFloat(dropdownItems[key].value) || 0;
+
+                        // Apply role-based multiplier
+                        if (player.role === "Capitano") {
+                            scoreValue *= 2; // Double the score for Capitano
+                        } else if (player.role === "Vice") {
+                            scoreValue *= 1.5; // Multiply by 1.5 for Vice
+                        }
+
+                        totalScore += scoreValue;
+                    }
+                });
+            });
+
+            return totalScore;
+        }
+
+        // Function to update the selected player when the user selects a player from the dropdown
+        function updateSelectedPlayer() {
+            const selectedPlayer = playerSelect.value;
+
+            if (selectedPlayer) {
+                currentSelectedPlayer = selectedPlayer;
+                console.log(`Player selected: ${selectedPlayer}`);
+                
+                // Clear selection for all list items
+                document.querySelectorAll('.scores-list li').forEach(li => li.classList.remove('selected'));
+                
+                // Mark the selected item as selected
+                const playerLi = document.querySelector(`[data-name="${selectedPlayer}"]`);
+                playerLi.classList.add('selected');
+                currentSelectedLi = playerLi;  // Keep reference to the clicked li
+                currentSelectedTeam = playerLi.getAttribute('team-id');
+                // Update dropdown to reflect current selection
+                updateDropdown();
+            } else {
+                currentSelectedPlayer = null; // Reset if no player is selected
+            }
+        }
+
+        // Event delegation for deleting sub-elements (associated items)
+        scoresList.addEventListener('click', function(e) {
+            // Handle trash bin click
             if (e.target && e.target.classList.contains('trash-bin')) {
                 const trashBin = e.target;  // The trash button itself
                 const associatedLi = trashBin.parentElement;  // The li that the trash bin belongs to
 
-                // Get the associated name from the li's data-associated-name attribute
+                // Get the associated name and key
                 const associatedName = associatedLi.getAttribute('data-associated-name');
                 const associatedItemKey = associatedLi.getAttribute('data-associated-key');
                 const associatedTeam = associatedLi.parentElement.getAttribute('team-id');
-                const associatedItemDesc = dropdownItems[associatedItemKey].description;
-
-                // console.log(associatedLi);
-                console.log(`Deleting item from team "${associatedTeam}", player "${associatedName}"`);
 
                 // Remove the associated item from the player's score map
-                delete chapters[0].squads.find(teamData => teamData.team_id === associatedTeam).players.find(player => player.name === associatedName).score[associatedItemKey];
+                const player = chapters[currentChapterIndex].squads.find(teamData => teamData.team_id === associatedTeam)
+                    .players.find(player => player.name === associatedName);
+                delete player.score[associatedItemKey];
 
                 // Remove the associated item from the DOM
                 associatedLi.remove();
@@ -207,61 +361,55 @@
                 // Re-enable the item in the dropdown
                 enableItemInDropdown(associatedItemKey);
 
-                // Print updated associations
-                console.log(`Updated score for ${associatedName}:`, chapters[0].squads.find(teamData => teamData.team_id === associatedTeam).players.find(player => player.name === associatedName).score);
+                // Update the total score
+                updateScoresList();
+                updateSelectedPlayer();
 
-                // Update dropdown
-                updateDropdown();
+                // Print updated associations
+                console.log(`Updated score for ${associatedName}:`, player.score);
             }
         });
 
+        // Function to add scores to a player's list
         function addScoresToList(playerName, teamId) {
-            // Find the player object by name
-            const player = chapters[0].squads.find(teamData => teamData.team_id === teamId).players.find(player => player.name === playerName);
+            const player = chapters[currentChapterIndex].squads.find(teamData => teamData.team_id === teamId)
+                .players.find(player => player.name === playerName);
 
-            // If the player exists and they have scores
             if (player && player.score) {
                 const playerScores = player.score;
 
-                // Find the corresponding player list in the DOM (if applicable)
                 const playerLi = document.querySelector(`[data-name="${playerName}"]`);
 
                 if (playerLi) {
-                    // Iterate over each key-value pair in the player's score object
                     Object.entries(playerScores).forEach(([key, value]) => {
-                        // Check if the score value exists in dropdownItems
                         const itemDescription = dropdownItems[key] ? dropdownItems[key].description : 'Unknown Item';
                         
-                        // Create a new <li> element for each score
                         const scoreLi = document.createElement('li');
                         scoreLi.textContent = itemDescription;
 
-                        // Add data attributes for the associated name and key
                         scoreLi.setAttribute('data-associated-name', playerName);
                         scoreLi.setAttribute('data-associated-key', key);
 
-                        // Add the "associated-item" class
                         scoreLi.classList.add('associated-item');
 
-                        // Create a trash bin button to allow removal of the score
                         const trashBin = document.createElement('button');
-                        trashBin.textContent = '🗑️';  // Trash bin icon
+                        trashBin.textContent = '🗑️';
                         trashBin.classList.add('trash-bin');
                         scoreLi.appendChild(trashBin);
 
-                        // Append the new <li> to the player's <li> container in the DOM
                         playerLi.appendChild(scoreLi);
                     });
                 }
             }
-}
-        function addNameToList() {
-            const selectedItemValue = document.getElementById("nameSelect").value;
-            const selectedItemKey = document.getElementById("nameSelect").selectedOptions[0].getAttribute('data-key');  // Get the key of the selected item
+        }
 
-            if (currentSelectedName && selectedItemValue) {
+        function addNameToList() {
+            const selectedItemValue = document.getElementById("scoreSelect").value;
+            const selectedItemKey = document.getElementById("scoreSelect").selectedOptions[0].getAttribute('data-key');  // Get the key of the selected item
+
+            if (currentSelectedPlayer && selectedItemValue) {
                 // Check if the item is already added to the player's score map
-                const player = chapters[0].squads.find(teamData => teamData.team_id === currentSelectedTeam).players.find(p => p.name === currentSelectedName);
+                const player = chapters[currentChapterIndex].squads.find(teamData => teamData.team_id === currentSelectedTeam).players.find(p => p.name === currentSelectedPlayer);
                 if (player.score[selectedItemKey]) {
                     alert("This item has already been added.");
                     return;
@@ -272,7 +420,7 @@
                 associatedLi.textContent = dropdownItems[selectedItemKey].description;
 
                 // Add the associated name as a custom attribute to the li
-                associatedLi.setAttribute('data-associated-name', currentSelectedName);
+                associatedLi.setAttribute('data-associated-name', currentSelectedPlayer);
                 associatedLi.setAttribute('data-associated-key', selectedItemKey);
 
                 // Create a trash bin button and append it to the associated item
@@ -284,7 +432,7 @@
                 associatedLi.classList.add("associated-item");
 
                 // Add the associated item to the selected player's score map
-                chapters[0].squads.find(teamData => teamData.team_id === currentSelectedTeam).players.find(player => player.name === currentSelectedName).score[selectedItemKey] = dropdownItems[selectedItemKey].value;
+                chapters[currentChapterIndex].squads.find(teamData => teamData.team_id === currentSelectedTeam).players.find(player => player.name === currentSelectedPlayer).score[selectedItemKey] = dropdownItems[selectedItemKey].value;
 
                 // Add the associated item to the selected player's list in the DOM
                 currentSelectedLi.appendChild(associatedLi);
@@ -293,10 +441,12 @@
                 removeItemFromDropdown(selectedItemKey);
 
                 // Clear the dropdown after selection
-                document.getElementById("nameSelect").value = "";
+                document.getElementById("scoreSelect").value = "";
 
                 updateDropdown();
-                console.log(`Updated score for ${currentSelectedName}:`, chapters[0].squads.find(teamData => teamData.team_id === currentSelectedTeam).players.find(player => player.name === currentSelectedName).score);
+                updateScoresList();
+                updateSelectedPlayer();
+                console.log(`Updated score for ${currentSelectedPlayer}:`, chapters[currentChapterIndex].squads.find(teamData => teamData.team_id === currentSelectedTeam).players.find(player => player.name === currentSelectedPlayer).score);
 
             } else {
                 alert("Please select a player on the left and an item from the dropdown.");
@@ -304,7 +454,7 @@
         }
 
         function removeItemFromDropdown(itemKey) {
-            const options = nameSelect.options;
+            const options = scoreSelect.options;
             for (let i = 1; i < options.length; i++) {
                 if (options[i].getAttribute('data-key') === itemKey) {
                     options[i].disabled = true;
@@ -312,11 +462,11 @@
                     break;
                 }
             }
-            console.log(chapters[0].squads.find(teamData => teamData.team_id === currentSelectedTeam).players);
+            console.log(chapters[currentChapterIndex].squads.find(teamData => teamData.team_id === currentSelectedTeam).players);
         }
 
         function enableItemInDropdown(itemKey) {
-            const options = nameSelect.options;
+            const options = scoreSelect.options;
             for (let i = 1; i < options.length; i++) {
                 if (options[i].getAttribute('data-key') === itemKey) {
                     options[i].disabled = false;
@@ -327,7 +477,7 @@
         }
 
         function updateDropdown() {
-            const options = nameSelect.options;
+            const options = scoreSelect.options;
 
             // Re-enable all options before updating
             for (let i = 1; i < options.length; i++) {
@@ -336,8 +486,8 @@
             }
 
             // Disable items already selected for the current player using key
-            if (currentSelectedName) {
-                const player = chapters[0].squads.find(teamData => teamData.team_id === currentSelectedTeam).players.find(p => p.name === currentSelectedName);
+            if (currentSelectedPlayer) {
+                const player = chapters[currentChapterIndex].squads.find(teamData => teamData.team_id === currentSelectedTeam).players.find(p => p.name === currentSelectedPlayer);
                 Object.keys(player.score).forEach(key => {
                     for (let i = 1; i < options.length; i++) {
                         if (options[i].getAttribute('data-key') === key) {
@@ -349,6 +499,12 @@
                 });
             }
         }
+
+        // Initialize the page
+        createTabs();
+        updateScoresList();
+        updatePlayersDropdown();
+
     </script>
 
 </body>
