@@ -246,6 +246,22 @@
             }).catch(err => {
                 console.error('Error copying to clipboard:', err);
             });
+
+            // Convert None to empty objects
+            chapters.forEach(chapter => {
+                // Check if the chapter data exsist
+                if(chapter.state === "None"){
+                    return;
+                }
+                // For valid chapters change the scores empty objects to None
+                chapter.squads.forEach(team => {
+                    team.players.forEach(player => {
+                        if (player.score === "None") {
+                            player.score = {};
+                        }
+                    });
+                });
+            });
         });
 
         function updatePlayersDropdown(){
