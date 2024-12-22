@@ -279,7 +279,8 @@
                 const teamDiv = document.createElement('div');
                 const teamIdSpan = document.createElement('span');
                 teamIdSpan.style.fontWeight = 'bold';
-                teamIdSpan.textContent = `Team ID: ${teamData.team_id} | Total Score: ${calculateTotalScore(teamData.players)} `;
+                teamData.total_score = calculateTotalScore(teamData.players);
+                teamIdSpan.textContent = `Team ID: ${teamData.team_id} | Total Score: ${teamData.total_score} `;
                 teamDiv.appendChild(teamIdSpan);
                 teamDiv.setAttribute('team-id', teamData.team_id);
                 scoresList.appendChild(teamDiv);
