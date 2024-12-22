@@ -72,6 +72,9 @@
             border-radius: 4px;
         }
 
+        .hide{
+            display:none;  
+        }
         /* Trash bin button styles */
         .trash-bin {
             position: absolute;
@@ -266,6 +269,9 @@
                     }
                     li.setAttribute('data-name', player.name);
                     li.setAttribute('team-id', teamData.team_id);
+                    if (playerScore === 0) {
+                        li.setAttribute('class', "hide");
+                    }
                     teamDiv.appendChild(li);
                     addScoresToList(player.name, teamData.team_id);
                 });
