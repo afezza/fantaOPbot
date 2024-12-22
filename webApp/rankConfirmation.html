@@ -248,7 +248,10 @@
             // Populate the names list
             chapter.squads.forEach(teamData => {
                 const teamDiv = document.createElement('div');
-                teamDiv.textContent = `Team ID: ${teamData.team_id} | Total Score: ${calculateTotalScore(teamData.players)} `;
+                const teamIdSpan = document.createElement('span');
+                teamIdSpan.style.fontWeight = 'bold';
+                teamIdSpan.textContent = `Team ID: ${teamData.team_id} | Total Score: ${calculateTotalScore(teamData.players)} `;
+                teamDiv.appendChild(teamIdSpan);
                 teamDiv.setAttribute('team-id', teamData.team_id);
                 scoresList.appendChild(teamDiv);
 
