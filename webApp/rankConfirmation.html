@@ -154,45 +154,7 @@
 
     <script>
         // The chapters array, which holds the data
-        const chapters = [
-            {
-                "chapter": "1133",
-                "state": "COMPLETED",
-                "squads": [
-                    {
-                        "team_id": "9346",
-                        "total_score": "17.0",
-                        "players": [
-                            { "name": "Denjiro", "role": "1° riserva", "score": {} },
-                            { "name": "Jinbe", "role": "Vice", "score": { "AppUltPag": "1", "App": "3" } }
-                        ]
-                    },
-                    {
-                        "team_id": "9034",
-                        "total_score": "49.0",
-                        "players": [
-                            { "name": "Barbanera", "role": "Titolare", "score": {} },
-                            { "name": "Bibi", "role": "Titolare", "score": {} },
-                            { "name": "Brogy", "role": "Capitano", "score": { "App": "3", "Ride": "3" } }
-                        ]
-                    }
-                ]
-            },
-            {
-                "chapter": "1134",
-                "state": "WAIT_RANKING",
-                "squads": [
-                    {
-                        "team_id": "9347",
-                        "total_score": "10.0",
-                        "players": [
-                            { "name": "Luffy", "role": "Titolare", "score": {} },
-                            { "name": "Zoro", "role": "Capitano", "score": {} }
-                        ]
-                    }
-                ]
-            }
-        ];
+        const chapters = [{"chapter":"1133","state":"COMPLETED","squads":[{"team_id":"9346","total_score":"17.0","players":[{"name":"Denjiro","role":"1\u00b0 riserva","score":{}},{"name":"Jinbe","role":"Capitano","score":{"AppUltPag":"1","App":"3"}},{"name":"Joyboy (del passato)","role":"2\u00b0 riserva","score":{}},{"name":"Karsee","role":"Titolare","score":{}},{"name":"Kiku","role":"Titolare","score":{}},{"name":"Loki","role":"Titolare","score":{}},{"name":"Morley","role":"Titolare","score":{}},{"name":"Nekomamushi","role":"Titolare","score":{}},{"name":"Otama","role":"Vice","score":{"AppCover":"4"}},{"name":"Vegapunk","role":"3\u00b0 riserva","score":{"App":"3"}}]},{"team_id":"10607","total_score":"27.0","players":[{"name":"Akainu","role":"3\u00b0 riserva","score":{}},{"name":"Benn Beckmann","role":"2\u00b0 riserva","score":{}},{"name":"Karasu","role":"1\u00b0 riserva","score":{}},{"name":"Kawamatsu","role":"Titolare","score":{}},{"name":"Luffy","role":"Capitano","score":{"AppUltPag":"1","App":"3","AppUlt":"5"}},{"name":"Oimo","role":"Titolare","score":{}},{"name":"Stansen","role":"Titolare","score":{"App":"3"}},{"name":"Urouge","role":"Titolare","score":{}},{"name":"Wapol","role":"Titolare","score":{}},{"name":"Yamato","role":"Vice","score":{"AppCover":"4"}}]},{"team_id":"10608","total_score":"15.5","players":[{"name":"Big Mom","role":"1\u00b0 riserva","score":{"Nom":"1"}},{"name":"Brook","role":"Titolare","score":{"AppUltPag":"1","Pian":"-2","App":"3"}},{"name":"Dory","role":"Vice","score":{"App":"3"}},{"name":"Im","role":"Titolare","score":{}},{"name":"Kuzan - Aokiji","role":"Titolare","score":{}},{"name":"Madre Carmel","role":"Titolare","score":{}},{"name":"Shanks","role":"Titolare","score":{}},{"name":"Shirahoshi","role":"2\u00b0 riserva","score":{}},{"name":"Zoro","role":"Capitano","score":{"AppUltPag":"1","App":"3"}},{"name":"Zunisha","role":"3\u00b0 riserva","score":{}}]},{"team_id":"9034","total_score":"49.0","players":[{"name":"Barbanera","role":"Titolare","score":{}},{"name":"Bibi","role":"Titolare","score":{}},{"name":"Brogy","role":"Capitano","score":{"App":"3","Ride":"3"}},{"name":"Doflamingo","role":"3\u00b0 riserva","score":{}},{"name":"Eustass Kid","role":"2\u00b0 riserva","score":{}},{"name":"Morgans","role":"1\u00b0 riserva","score":{}},{"name":"Nico Robin","role":"Vice","score":{"AppFl":"4","Tit":"3","AppTag":"7","AppUltPag":"1","App":"3","Ride":"3","Pian":"-2","MVP":"5"}},{"name":"Saint Garling Figarland","role":"Titolare","score":{}},{"name":"Sauro","role":"Titolare","score":{"AppFl":"4","AppUltPag":"1","App":"3","Ride":"3","Bru":"-3","Pian":"-2","CadAcq":"-5"}},{"name":"Trafalgar Law","role":"Titolare","score":{}}]},{"team_id":"6095","total_score":"14.0","players":[{"name":"Chopper","role":"Vice","score":{"App":"3","AppUltPag":"1","Pian":"-2"}},{"name":"Coby","role":"1\u00b0 riserva","score":{}},{"name":"Crocodile","role":"2\u00b0 riserva","score":{}},{"name":"Dragon","role":"Titolare","score":{}},{"name":"Gerd","role":"Capitano","score":{"App":"3"}},{"name":"Lilith  (Punk 02)","role":"Titolare","score":{"App":"3"}},{"name":"Nami","role":"Titolare","score":{"AppUltPag":"1","App":"3","Pian":"-2"}},{"name":"Orso Bartolomew","role":"Titolare","score":{}},{"name":"Sabo","role":"Titolare","score":{}},{"name":"Smoker","role":"3\u00b0 riserva","score":{}}]},{"team_id":"10372","total_score":"24.0","players":[{"name":"Buggy","role":"Titolare","score":{}},{"name":"Franky","role":"Titolare","score":{"AppUltPag":"1","App":"3","Occhi":"3","Pian":"-2"}},{"name":"Garp","role":"3\u00b0 riserva","score":{}},{"name":"Hajrudin","role":"Vice","score":{"App":"3","Ride":"3"}},{"name":"Ivankov","role":"2\u00b0 riserva","score":{}},{"name":"Jewerly Bonney","role":"Titolare","score":{"App":"3","Occhi":"3"}},{"name":"Mihawk","role":"Titolare","score":{}},{"name":"Roger","role":"Titolare","score":{}},{"name":"Sanji","role":"Capitano","score":{"AppUltPag":"1","App":"3","Pian":"-2"}},{"name":"Yasopp","role":"1\u00b0 riserva","score":{}}]},{"team_id":"9359","total_score":"7.0","players":[{"name":"Apoo","role":"Titolare","score":{}},{"name":"Goldberg","role":"Titolare","score":{"App":"3"}},{"name":"Jarul","role":"Vice","score":{}},{"name":"Katakuri","role":"2\u00b0 riserva","score":{}},{"name":"Komourasaki/Hiyori","role":"1\u00b0 riserva","score":{}},{"name":"Raizou","role":"Titolare","score":{}},{"name":"Re Harald","role":"Titolare","score":{}},{"name":"Road","role":"Titolare","score":{"App":"3","Catt":"-3"}},{"name":"Silver Rayleigh","role":"3\u00b0 riserva","score":{}},{"name":"Usopp","role":"Capitano","score":{"AppUltPag":"1","App":"3","Pian":"-2"}}]}]},{"chapter":"1134","state":"WAIT_CONFIRMATION","squads":[{"team_id":"9346","total_score":"20.0","players":[{"name":"Denjiro","role":"1\u00b0 riserva","score":{}},{"name":"Jinbe","role":"Capitano","score":{"App":"3","App1Pag":"1"}},{"name":"Joyboy (del passato)","role":"Titolare","score":{}},{"name":"Karsee","role":"Titolare","score":{}},{"name":"Kiku","role":"2\u00b0 riserva","score":{}},{"name":"Loki","role":"Vice","score":{"App":"3","Den":"3"}},{"name":"Morley","role":"Titolare","score":{}},{"name":"Nekomamushi","role":"3\u00b0 riserva","score":{}},{"name":"Otama","role":"Titolare","score":{}},{"name":"Vegapunk","role":"Titolare","score":{"App":"3"}}]},{"team_id":"10607","total_score":"30.0","players":[{"name":"Akainu","role":"1\u00b0 riserva","score":{}},{"name":"Benn Beckmann","role":"3\u00b0 riserva","score":{}},{"name":"Karasu","role":"2\u00b0 riserva","score":{}},{"name":"Kawamatsu","role":"Titolare","score":{}},{"name":"Luffy","role":"Capitano","score":{"App":"3","App1Pag":"1","Occhi":"3","Ride":"3","App0p":"5"}},{"name":"Oimo","role":"Titolare","score":{}},{"name":"Stansen","role":"Vice","score":{}},{"name":"Urouge","role":"Titolare","score":{}},{"name":"Wapol","role":"Titolare","score":{}},{"name":"Yamato","role":"Titolare","score":{}}]},{"team_id":"10608","total_score":"10.0","players":[{"name":"Big Mom","role":"Titolare","score":{}},{"name":"Brook","role":"Titolare","score":{"App":"3","App1Pag":"1","Pian":"-2"}},{"name":"Dory","role":"Vice","score":{}},{"name":"Im","role":"Titolare","score":{}},{"name":"Kuzan - Aokiji","role":"Titolare","score":{}},{"name":"Madre Carmel","role":"1\u00b0 riserva","score":{}},{"name":"Shanks","role":"Titolare","score":{}},{"name":"Shirahoshi","role":"2\u00b0 riserva","score":{}},{"name":"Zoro","role":"Capitano","score":{"App":"3","App1Pag":"1"}},{"name":"Zunisha","role":"3\u00b0 riserva","score":{}}]},{"team_id":"9034","total_score":"28.0","players":[{"name":"Barbanera","role":"Titolare","score":{}},{"name":"Bibi","role":"Titolare","score":{}},{"name":"Brogy","role":"Titolare","score":{"AppUltPag":"1","App":"3","AppUlt":"5"}},{"name":"Doflamingo","role":"1\u00b0 riserva","score":{}},{"name":"Eustass Kid","role":"Titolare","score":{}},{"name":"Morgans","role":"2\u00b0 riserva","score":{}},{"name":"Nico Robin","role":"Capitano","score":{"App":"3","App1Pag":"1","Pian":"-2"}},{"name":"Saint Garling Figarland","role":"3\u00b0 riserva","score":{}},{"name":"Sauro","role":"Vice","score":{"App":"3","App1Pag":"1","Ride":"3","Pian":"-2","MVP":"5"}},{"name":"Trafalgar Law","role":"Titolare","score":{}}]},{"team_id":"6095","total_score":"14.5","players":[{"name":"Chopper","role":"Titolare","score":{"App":"3","App1Pag":"1","Pian":"-2"}},{"name":"Coby","role":"Titolare","score":{}},{"name":"Crocodile","role":"3\u00b0 riserva","score":{}},{"name":"Dragon","role":"2\u00b0 riserva","score":{}},{"name":"Gerd","role":"Vice","score":{"App":"3"}},{"name":"Lilith  (Punk 02)","role":"Capitano","score":{"App":"3"}},{"name":"Nami","role":"Titolare","score":{"App":"3","App1Pag":"1","Pian":"-2"}},{"name":"Orso Bartolomew","role":"Titolare","score":{}},{"name":"Sabo","role":"Titolare","score":{}},{"name":"Smoker","role":"1\u00b0 riserva","score":{}}]},{"team_id":"10372","total_score":"11.0","players":[{"name":"Buggy","role":"Titolare","score":{}},{"name":"Franky","role":"Vice","score":{"App":"3","App1Pag":"1","Pian":"-2"}},{"name":"Garp","role":"Titolare","score":{}},{"name":"Hajrudin","role":"Titolare","score":{"Nom":"1"}},{"name":"Ivankov","role":"3\u00b0 riserva","score":{}},{"name":"Jewerly Bonney","role":"Titolare","score":{"App":"3"}},{"name":"Mihawk","role":"1\u00b0 riserva","score":{}},{"name":"Roger","role":"Titolare","score":{}},{"name":"Sanji","role":"Capitano","score":{"App":"3","App1Pag":"1","Pian":"-2"}},{"name":"Yasopp","role":"2\u00b0 riserva","score":{}}]},{"team_id":"9359","total_score":"4.0","players":[{"name":"Apoo","role":"Titolare","score":{}},{"name":"Goldberg","role":"Titolare","score":{}},{"name":"Jarul","role":"Capitano","score":{}},{"name":"Katakuri","role":"2\u00b0 riserva","score":{}},{"name":"Komourasaki/Hiyori","role":"1\u00b0 riserva","score":{}},{"name":"Raizou","role":"Titolare","score":{}},{"name":"Re Harald","role":"Titolare","score":{"Nom":"1"}},{"name":"Road","role":"Titolare","score":{}},{"name":"Silver Rayleigh","role":"3\u00b0 riserva","score":{}},{"name":"Usopp","role":"Vice","score":{"App":"3","App1Pag":"1","Pian":"-2"}}]}]}];
 
         let currentSelectedPlayer = null;
         let currentSelectedTeam = null;
@@ -205,24 +167,7 @@
         const chapterTitle = document.getElementById('chapterTitle'); // Reference to the chapter title
 
         // Dropdown Items
-        const dropdownItems = {
-            "AppFl": {
-                "value": "4",
-                "description": "Appare in un Flashback"
-            },
-            "AppTag": {
-                "value": "7",
-                "description": "Appare in una taglia"
-            },
-            "AppUltPag": {
-                "value": "1",
-                "description": "Appare nell'ultima pagina"
-            },
-            "App": {
-                "value": "3",
-                "description": "Il personaggio appare"
-            }
-        };
+        const dropdownItems = {"AppFl":{"value":"4","description":"Appare in un Flashback"},"AppTag":{"value":"7","description":"Appare in una taglia"},"AppUltPag":{"value":"1","description":"Appare nell'ultima pagina"},"App":{"value":"3","description":"Apparizione nel capitolo"},"AppCover":{"value":"4","description":"Apparizione nella cover"},"App1Pag":{"value":"1","description":"Apparizione prima pagina del capitolo"},"CadAcq":{"value":"-5","description":"Cade in acqua"},"Ener":{"value":"20","description":"Ener Face"},"Occhi":{"value":"3","description":"Forma degli occhi particolare"},"Sta":{"value":"-3","description":"Il personaggio è stanco/inerme"},"Strate":{"value":"3","description":"Il Personaggio escogita una strategia (deve essere chiara o spiegata da qualcuno)"},"Den":{"value":"3","description":"Il Personaggio parla al Lumacofono (o qualsiasi dispositivo simile)"},"Ride":{"value":"3","description":"Il Personaggio ride (risata caratteristica)"},"Bru":{"value":"-3","description":"Il Personaggio subisce una bruciatura"},"Nom":{"value":"1","description":"Il personaggio viene nominato (ma non appare)"},"Tit":{"value":"3","description":"Il Titolo fa riferimento al personaggio"},"ManFru":{"value":"10","description":"Mangia un frutto del Diavolo"},"Muo":{"value":"-20","description":"Muore"},"ParSc":{"value":"1","description":"Partecipa ad uno scontro"},"PerSc":{"value":"-4","description":"Perde scontro"},"Pian":{"value":"-2","description":"Piange"},"App0p":{"value":"5","description":"Primissimo personaggio ad apparire"},"SalvQual":{"value":"3","description":"Salva qualcuno"},"Trasf":{"value":"6","description":"Si trasforma"},"SubCol":{"value":"-2","description":"Subisce un colpo"},"Svie":{"value":"-4","description":"Sviene"},"MVP":{"value":"5","description":"MVP del capitolo"},"Kill":{"value":"10","description":"Uccide qualcuno"},"AppUlt":{"value":"5","description":"Ultimo personaggio ad apparire"},"Haki":{"value":"3","description":"Utilizza Haki"},"UtTec":{"value":"1","description":"Utilizza una tecnica"},"Avvel":{"value":"-4","description":"Viene avvelenato"},"Catt":{"value":"-3","description":"Viene Catturato/Imprigionato"},"Fer":{"value":"-3","description":"Viene Ferito"},"Mut":{"value":"-7","description":"Viene Mutilato"},"Scop":{"value":"-2","description":"Viene Scoperto"},"Vinc":{"value":"7","description":"Vince Scontro"}};
 
         // Function to populate chapter tabs
         function createTabs() {
@@ -309,7 +254,13 @@
 
                 teamData.players.forEach(player => {
                     const li = document.createElement('li');
-                    li.textContent = player.name + " (" + player.role + ")";
+                    const playerScore = calculatePlayerScore(player);
+                    li.textContent = `${player.name} (${player.role}) ${playerScore}`;
+                    if (player.role === "Capitano") {
+                        li.textContent += " x 2 => " + (playerScore*2);
+                    } else if (player.role === "Vice") {
+                        li.textContent += " x 1.5 => " + (playerScore*1.5); 
+                    }
                     li.setAttribute('data-name', player.name);
                     li.setAttribute('team-id', teamData.team_id);
                     teamDiv.appendChild(li);
@@ -321,10 +272,24 @@
             Object.entries(dropdownItems).forEach(([key, item]) => {
                 const option = document.createElement('option');
                 option.value = item.value;
-                option.textContent = item.description;
+                option.textContent = item.description + ` ` + item.value;
                 option.setAttribute('data-key', key);
                 scoreSelect.appendChild(option);
             });
+        }
+
+        // Function to calculate the score for a player
+        function calculatePlayerScore(player) {
+            let playerScore = 0;
+
+            Object.entries(player.score).forEach(([key, value]) => {
+                if (dropdownItems[key]) {
+                    let scoreValue = parseFloat(dropdownItems[key].value) || 0;
+                    playerScore += scoreValue;
+                }
+            });
+
+            return playerScore;
         }
 
         // Function to calculate the total score for a team
@@ -418,7 +383,12 @@
 
                 if (playerLi) {
                     Object.entries(playerScores).forEach(([key, value]) => {
-                        const itemDescription = dropdownItems[key] ? dropdownItems[key].description : 'Unknown Item';
+                        let itemDescription;
+                        if (dropdownItems[key]) {
+                            itemDescription = dropdownItems[key].description + ` ` + dropdownItems[key].value;
+                        } else {
+                            itemDescription = 'Unknown Item';
+                        }
                         
                         const scoreLi = document.createElement('li');
                         scoreLi.textContent = itemDescription;
