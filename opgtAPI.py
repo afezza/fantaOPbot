@@ -258,8 +258,10 @@ def retrieve_rank_from_app(key:str,db_entry):
                         player['score'] = {}
                         for j in range(len(vote_score_res[i])-1):
                             name = vote_score_res[i][j][0].text.split()[0]
-                            # rank = vote_score_res[i][j][0].text.split()[1].replace('(','').replace(')','')
-                            rank = rank_list[name]['value']
+                            if name in rank_list:
+                                rank = rank_list[name]['value']
+                            else:
+                                continue
                             player['score'][name] = rank
                             if(player['role'] == "Capitano"):
                                 rank = str(float(rank) * 2)
