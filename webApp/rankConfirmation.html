@@ -121,6 +121,8 @@
     </style>
 </head>
 <body>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css" />
+    <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
 
     <!-- Add the button to the top right -->
     <button id="logAndCopyButton">Log and Copy JSON</button>
@@ -563,6 +565,34 @@
         updateScoresList();
         updatePlayersDropdown();
 
+        var playerDropdownSearch = new Choices('#playerSelect', {
+                                        searchEnabled: true,
+                                        searchChoices: true, // Ensure that search is enabled for the choices as well
+                                        searchResultLimit: 10,  // Limit the number of search results (optional)
+                                        searchFloor: 3, // Require at least 1 character before triggering search
+                                        shouldSort: false,  // Optional: Whether to sort the options alphabetically or not
+                                        itemSelectText: '',
+                                        searchPlaceholderValue: 'Type to search...', // Optional: custom search placeholder
+                                        fuseOptions: {
+                                            includeScore: true,
+                                            threshold: 0.0, // Exact match
+                                            keys: ['label', 'value']
+                                        },
+                                    });
+        var scoreDropdownSearch = new Choices('#scoreSelect', {
+                                        searchEnabled: true,
+                                        searchChoices: true, // Ensure that search is enabled for the choices as well
+                                        searchResultLimit: 10,  // Limit the number of search results (optional)
+                                        searchFloor: 1, // Require at least 1 character before triggering search
+                                        shouldSort: false,  // Optional: Whether to sort the options alphabetically or not
+                                        itemSelectText: '',
+                                        searchPlaceholderValue: 'Type to search...', // Optional: custom search placeholder
+                                        fuseOptions: {
+                                            includeScore: true,
+                                            threshold: 0.40, // Exact match
+                                            keys: ['label', 'value']
+                                        },
+                                    });
     </script>
 
 </body>
