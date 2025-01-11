@@ -13,7 +13,19 @@ logger = logging.getLogger()
 
 not_auth_answers = ["Spiacente pezzente non hai il permesso di farlo!",
                     "Va a papparti qualche fiore!!",
-                    "Hai davvero pensato che ci saresti riuscito?! Patetico!!"]
+                    "Hai davvero pensato che ci saresti riuscito?! Patetico!!",
+                    "Non è che tu sia stupido. È solo che la tua intelligenza è molto ben nascosta.",
+                    "Tu non sei stupido, sei solo un po’ pigro, e spesso troppo pigro per renderti conto di quanto sei stupido.",
+                    "Ti darei una mano, ma sono troppo occupato a cercare di non affogare nel mio stesso fallimento.",
+                    "Se il cervello fosse denaro, saresti un mendicante.",
+                    "Tu non sei così intelligente, ma almeno hai un lavoro che ti permette di sembrare occupato.",
+                    "Lei è un uomo molto dignitoso... per uno che vive ancora con sua madre.",
+                    "Se la stupidità fosse un crimine, tu saresti in prigione per il resto della tua vita.",
+                    "Stai cercando di sembrare stupido? Perché, se è così, ci stai riuscendo!",
+                    "Sai, è impressionante quanto tu riesca a sembrare così serio mentre vendi ciambelle.",
+                    "Se fossi un film, saresti sicuramente La Vita è Bella… ma solo la parte noiosa.",
+                    "Oh, guarda, è il tizio che ride come un idraulico ubriaco!",
+                    "Se ci fosse una medaglia per non combinare mai niente di buono, vinceresti il premio!"]
 
 # Public Functions
 ###
