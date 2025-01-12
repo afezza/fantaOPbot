@@ -93,7 +93,15 @@
         }
 
         .dropdown-container {
-            width: 45%;
+            position: fixed;
+            top: 100px; /* Adjust this value to position it where you want */
+            right: 20px; /* You can adjust the horizontal position */
+            width: 50%; /* Adjust the width to fit your design */
+            background-color: white; /* Optional: Adds background to make the dropdown stand out */
+            padding: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Optional: Adds shadow for better visibility */
+            z-index: 1000; /* Ensures it's on top of other elements */
+            max-height: 80%; /* Optional: Limits height to prevent covering too much of the screen */
         }
 
         select {
