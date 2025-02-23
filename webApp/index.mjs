@@ -82,7 +82,18 @@ export const handler = async (event) => {
         }
         else if(event.rawPath === '/rank_verification')
         {
-            console.log("The user asked for rank verification");
+            if(event.routeKey === 'GET /rank_verification')
+            {
+                console.log("The user asked for rank verification page");
+            }
+            else if(event.routeKey === 'POST /rank_verification')
+            {
+                console.log("The user asked for rank verification save");
+                let body = JSON.parse(event.body);
+                console.log(body.token);
+                console.log(JSON.stringify(body.jsonData));
+                body_text = "ok"
+            }
         }
 
         let response = {
