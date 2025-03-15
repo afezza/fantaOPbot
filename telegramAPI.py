@@ -53,6 +53,7 @@ class BotMessage:
                 self.chat_id = chat_id
                 self.chat_type = None
                 self.user_id = user_id
+                self.user_chat = None
                 self.parse_mode = "HTML"
         else:                               # Case in which both inputs are provided
             if(text is not None or chat_id is not None or user_id is not None):
@@ -65,6 +66,7 @@ class BotMessage:
                 self.chat_id = str(data["message"]["chat"]["id"])
                 self.chat_type = str(data["message"]["chat"]["type"])
                 self.user_id = str(data["message"]["from"]["username"])
+                self.user_chat = str(data["message"]["from"]["id"])
                 self.parse_mode = "HTML"
 
     def sendMessage(self):

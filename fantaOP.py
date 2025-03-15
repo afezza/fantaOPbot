@@ -204,6 +204,10 @@ def run_command(rcvd_message:telegramAPI.BotMessage):
         if("/scarica_voti" in rcvd_message.text): 
             reply_message.text = opgtAPI.retrieve_rank_from_app(rcvd_message.chat_id,db_response)
             return reply_message
+        if("/valida_voti" in rcvd_message.text): 
+            reply_message.text = opgtAPI.ranking_validation_token_generation(rcvd_message.chat_id,db_response)
+            reply_message.chat_id = rcvd_message.user_chat
+            return reply_message
         if("/asta_risultati" in rcvd_message.text): # Prendi il risultato delle buste 
             reply_message.text = retrieve_asta_results(rcvd_message.chat_id,db_response)
             return reply_message

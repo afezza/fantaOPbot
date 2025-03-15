@@ -5,6 +5,8 @@ import json
 import urllib3
 import logging
 from lxml import etree
+import binascii
+import os
 
 import dynamodbAPI
 
@@ -135,7 +137,7 @@ def retrieve_squads_from_db(key:str,db_entry,day):
     # Retrieve the info from the database per each team in the list
     for team in match_list[day]['squads']:
         team_id = team_name_list[team['team_id']]
-        text_answer += "\n<u>Team "+ team_id + "</u>: "+ team['total_score'] + "\n"
+        text_answer += "\n<u>Team "+ team_id + "</u>: "+ str(team['total_score']) + "\n"
         for player in team['players']:
             text_answer += " &#8226 "+ player['name'] + ": ("+player['role'] + ")\n"
             text_answer += " { "+ str(player['score']) + "}\n"
@@ -294,3 +296,25 @@ def retrieve_rank_from_app(key:str,db_entry):
         return text_answer
 
     return "Impossibile scaricare i voti"
+
+def ranking_validation_token_generation(key:str,db_entry):
+    """Generates a token for the ranking validation to authenticate the webpage 
+        and store it on the database.
+
+        Parameters:
+        key : chat id of the corresponding tournment
+        db_entry : data of the corresponding tournment stored on the database 
+
+        Returns:
+        text_match_answer : the token to use on the webpage 
+    """
+
+    ranking_token = str(binascii.hexlify(os.urandom(20)).decode())
+
+    # Store data on database
+    dynamodbAPI.update_db_column(key,'rank_validation_token', ranking_token)
+
+    text_answer = "Your token: " + ranking_token + "\n"
+    text_answer += "Visit https://utaxx3uzbb.execute-api.eu-north-1.amazonaws.com/rank_validation"
+
+    return text_answer
