@@ -1,0 +1,69 @@
+/*--------------------
+Leaderboard
+--------------------*/
+#chaptersLeaderboards {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.leaderboard {
+  width: 350px;
+  /* height: 508px; */
+  height: 460px;
+  background: linear-gradient(to bottom, #3a404d, #181c26);
+  border-radius: 10px;
+  box-shadow: 0 7px 30px rgba(62, 9, 11, .3);
+
+  overflow-y:scroll;  /* TODO: these 2 lines disable touch horizontal scroll on carousel */
+  overflow-x:hidden;
+
+  h1 {
+    font-size: 28px;
+    color: #e1e1e1;
+    padding: 13px;
+  }
+
+  .team-elem {
+    margin: 0;
+    padding: 0;
+    width: 116%;
+    transform: translate(-7%, -7%);
+    background: linear-gradient(to bottom, #f39264, #f2606f);
+    border: 1px solid #535353;
+
+    img {
+      border: 2px solid #e1e1e1;
+    }
+
+    .team-name {
+    font-size: 18px;
+    display: flex;
+    align-items: center; /* Vertical alignment */
+    }
+
+    .team-score {
+    font-size: 18px;
+    display: flex;
+    align-items: center; /* Vertical alignment */
+    justify-content: center; /* Horizontal alignment */
+    } 
+  }
+}
+
+.carousel-control-prev, .carousel-control-next {
+  position: absolute;
+  top: 110%;
+}
+
+.carousel-indicators {
+  position: absolute;
+  top: 106%
+}
+
+.carousel-indicators [data-bs-target] {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+}
