@@ -46,7 +46,7 @@ function loadClassificationInfo(containerObj) {
             let teamElemHtml = `
                 <div class="container row team-elem">
                     <div class="col">
-                        <img src="data:image/jpeg;base64,${teamInfo.jolly_roger}" class="rounded-circle mw-100" alt="..."></img> 
+                        <img src="${teamInfo.jolly_roger}" class="rounded-circle mw-100" alt="..."></img> 
                     </div>
                     <div class="col-7 team-name">${teamInfo.team_name}</div>
                     <div class="col-2 team-score">${team.total_score}</div>
@@ -73,7 +73,7 @@ function loadClassificationInfo(containerObj) {
         let teamElemHtml = `
             <div class="container row team-elem">
                 <div class="col">
-                    <img src="data:image/jpeg;base64,${teamInfo.jolly_roger}" class="rounded-circle mw-100" alt="..."></img> 
+                    <img src="${teamInfo.jolly_roger}" class="rounded-circle mw-100" alt="..."></img> 
                 </div>
                 <div class="col-7 team-name">${teamInfo.team_name}</div>
                 <div class="col-2 team-score">${team.total_score}</div>

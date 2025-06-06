@@ -1,16 +1,21 @@
 /*--------------------
 Leaderboard
 --------------------*/
+.op-app {
+  position: relative;
+  height: 90vh;
+  overflow: hidden; 
+}
+
 #chaptersLeaderboards {
   position: absolute;
-  top: 50%;
+  top: 45%;
   left: 50%;
   transform: translate(-50%, -50%);
 }
 
 .leaderboard {
   width: 350px;
-  /* height: 508px; */
   height: 460px;
   background: linear-gradient(to bottom, #3a404d, #181c26);
   border-radius: 10px;
