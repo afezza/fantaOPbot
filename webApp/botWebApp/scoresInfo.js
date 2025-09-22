@@ -66,8 +66,14 @@ function chapterScoresSelection(value){
                         }
                         pageElem += `<li class="list-group-item">
                         <div class="row">
-                        <div class="col-5">${matchesData[match]['squads'][team]['players'][player]['name']}</div>
-                        <div class="col-7">`
+                        <div class="col-5">${matchesData[match]['squads'][team]['players'][player]['name']} `
+                        if(matchesData[match]['squads'][team]['players'][player]['role'] === "Capitano"){
+                            pageElem += `<span class="badge bg-primary">x2</span>`
+                        } 
+                        else if(matchesData[match]['squads'][team]['players'][player]['role'] === "Vice"){
+                            pageElem += `<span class="badge bg-info text-dark">x1.5</span>`
+                        }
+                        pageElem += `</div><div class="col-7">`
                         Object.keys(matchesData[match]['squads'][team]['players'][player]['score']).forEach(key => {
                             if(matchesData[match]['squads'][team]['players'][player]['score'][key] > 0){
                                 pageElem += `<span class="badge bg-success me-2" data-bs-toggle="tooltip" data-bs-placement="top" title="${scoresData[key]['description']}">
