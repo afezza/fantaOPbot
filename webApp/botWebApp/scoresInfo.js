@@ -53,7 +53,6 @@ function chapterScoresSelection(value){
             let pageElemObj = document.createElement('div')
             pageElemObj.classList.add('page-element');
             pageElemObj.classList.add('col-sm-6');
-            // pageElem =`<div class="card shadow" style="height: 250px; max-height: 250px; overflow: scroll">
             pageElem =`<div class="card shadow">
                     <div class="card-header row">
                     <h4 class="col-9">${teams_names.get(matchesData[match]['squads'][team]['team_id'])}</h4>
