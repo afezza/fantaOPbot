@@ -3,120 +3,145 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Names List with Dropdown</title>
+    <title>Teams and Scores</title>
     <style>
         body {
             font-family: Arial, sans-serif;
-            padding: 20px;
-            position: relative;
-        }
-
-        /* Tab Panel Styles */
-        .tab-panel {
+            margin: 0;
             display: flex;
-            justify-content: flex-start;
-            margin-bottom: 20px;
-            cursor: pointer;
-            border-bottom: 2px solid #ccc;
-            margin-left: 0;
+            height: 100vh;
         }
-
+        .sidebar {
+            width: 200px;
+            background-color: #f0f0f0;
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+        }
         .tab-item {
             padding: 10px;
-            background-color: #f0f0f0;
+            margin-bottom: 5px;
+            background-color: #ddd;
             border-radius: 4px;
-            margin-right: 10px;
-            transition: background-color 0.3s;
+            cursor: pointer;
+            text-align: center;
         }
-
         .tab-item:hover, .tab-item.active {
             background-color: #b3d9ff;
         }
-
-        /* Container Layout */
-        .container {
+        .right-section {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 10px;
+        }
+        .search-bar {
+            padding: 10px;
+            background-color: #ddd;
             display: flex;
             justify-content: space-between;
+            align-items: center;
         }
-
-        .list-container {
-            width: 45%;
-        }
-
-        .list-container h2 {
-            margin-bottom: 10px;
-        }
-
-        .scores-list {
-            list-style-type: none;
-            padding: 0;
-            cursor: pointer;
-        }
-
-        .scores-list li {
+        .search-box {
+            width: 300px;
             padding: 8px;
-            margin: 5px 0;
-            background-color: #f0f0f0;
+            border: 1px solid #ccc;
             border-radius: 4px;
-            position: relative;
         }
-
-        .scores-list li.selected {
-            background-color: #b3d9ff;
+        .chapter-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
-
-        .associated-item {
+        .chapter-title {
+            font-size: 20px;
+            font-weight: bold;
+        }
+        .chapter-state {
             padding: 5px;
-            margin-left: 20px;
-            background-color: #e0e0e0;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            background-color: white;
+        }
+        .teams-container {
+            flex: 1;
+            padding: 10px;
+            overflow-y: auto;
+        }
+        .team {
+            margin-bottom: 15px;
+            padding: 10px;
+            background-color: #f9f9f9;
+            border: 1px solid #ccc;
             border-radius: 4px;
         }
-
-        .hide{
-            display:none;  
+        .team h2 {
+            margin: 0 0 10px 0;
         }
-        /* Trash bin button styles */
+        .player-list {
+            list-style: none;
+            padding: 0;
+        }
+        .player-item {
+            padding: 10px;
+            background-color: #e0e0e0;
+            margin-bottom: 5px;
+            border-radius: 4px;
+        }
+        .player-info {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .role-dropdown {
+            padding: 3px;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+            background-color: white;
+            margin-left: 10px;
+        }
+        .score-search {
+            padding: 3px;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+            background-color: transparent;
+            margin-left: 10px;
+        }
+
+        .score-list {
+            list-style: none;
+            padding-left: 20px;
+            margin-top: 5px;
+        }
+        .total-score {
+            font-weight: bold;
+            margin-left: auto;
+        }
         .trash-bin {
-            position: absolute;
-            right: 10px;
-            top: 50%;
-            transform: translateY(-50%);
             background-color: transparent;
             border: none;
             font-size: 16px;
             cursor: pointer;
             color: #888;
         }
-
+        .add-button {
+            cursor: pointer;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            margin-left: 10px;
+            border-radius: 4px;
+        }
         .trash-bin:hover {
             color: #f44336;
         }
-
-        .dropdown-container {
-            position: fixed;
-            top: 100px; /* Adjust this value to position it where you want */
-            right: 20px; /* You can adjust the horizontal position */
-            width: 50%; /* Adjust the width to fit your design */
-            background-color: white; /* Optional: Adds background to make the dropdown stand out */
-            padding: 20px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Optional: Adds shadow for better visibility */
-            z-index: 1000; /* Ensures it's on top of other elements */
-            max-height: 80%; /* Optional: Limits height to prevent covering too much of the screen */
-        }
-
-        select {
-            width: 100%;
-            padding: 8px;
-            margin-bottom: 20px;
-        }
-
-        .header-container {
+        .token-container {
             display: flex;
             align-items: center; /* Vertically centers the text box and button */
             justify-content: flex-end; /* Aligns to the right side */
             margin-right: 20px; /* Optional: Adds space on the right side */
         }
-
         #inputToken {
             padding: 8px;
             margin-right: 10px; /* Space between text box and button */
@@ -124,7 +149,6 @@
             border: 1px solid #ccc;
             border-radius: 4px;
         }
-
         #saveButton {
             padding: 8px 15px;
             background-color: #4CAF50;
@@ -133,50 +157,32 @@
             border-radius: 4px;
             cursor: pointer;
         }
-
         #saveButton:hover {
             background-color: #45a049;
         }
     </style>
 </head>
 <body>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css" />
-    <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
-
-    <!-- Wrapper for button and textbox -->
-
-    <!-- Tab Panel -->
-    <div class="tab-panel" id="tabPanel">
-        <div class="header-container">
-            <input type="text" id="inputToken" placeholder="Enter token...">
-            <button id="saveButton">Save</button>
+    <div class="sidebar" id="tabPanel"></div>
+    
+    <div class="right-section">
+        <div class="search-bar">
+            <div class="chapter-container">
+                <span class="chapter-title" id="chapterTitle">Select a chapter</span>
+                <select id="chapterStatus" class="chapter-state">
+                    <option value="None">None</option>
+                    <option value="WAIT_RANKING">WAIT_RANKING</option>
+                    <option value="WAIT_CONFIRMATION">WAIT_CONFIRMATION</option>
+                    <option value="COMPLETED">COMPLETED</option>
+                </select>
+            </div>
+            <input type="text" class="search-box" id="searchBox" placeholder="Search players...">
+            <div class="token-container">
+                <input type="text" id="inputToken" placeholder="Enter token...">
+                <button id="saveButton">Save</button>
+            </div>
         </div>
-        <!-- Dynamic tabs will be inserted here -->
-    </div>
-
-    <div class="container">
-        <div class="list-container">
-            <!-- This will dynamically display "Chapter [chapter number]" -->
-            <h2 id="chapterTitle">Loading...</h2>
-            <ul class="scores-list" id="scoresList">
-                <!-- Players will be dynamically inserted here -->
-            </ul>
-        </div>
-
-        <div class="dropdown-container">
-            <!-- New dropdown to select a player for the current chapter -->
-            <h2>Select Player</h2>
-            <select id="playerSelect" onchange="updateSelectedPlayer()">
-                <option value="">-- Select a Player --</option>
-                <!-- Player options will be dynamically inserted here -->
-            </select>
-
-            <h2>Select Points</h2>
-            <select id="scoreSelect" onchange="addNameToList()">
-                <option value="">-- Select an item --</option>
-                <!-- Dropdown items will be dynamically inserted here -->
-            </select>
-        </div>
+        <div class="teams-container" id="teamsContainer"></div>
     </div>
 
     <script>

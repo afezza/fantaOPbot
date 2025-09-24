@@ -1,27 +1,27 @@
+const scores = //SCORES_ARRAY;
+let matchesData = //CHAPTER_DATA;
+let teamsData = //TEAMS_DATA;
+// let teamsData = [{"team_name":"Gli animaletti del bosco","team_id":"9346","owner":"@Skizzo_lucido","tokens_left":"0","jolly_roger":"https://i.ibb.co/PZ2Rq3sJ/photo-5829911947175380908-c.jpg","players":[{"name":"Saint Sommers","price":"50"},{"name":"Bijorn","price":"35"},{"name":"Mag","price":"38"},{"name":"Brogy","price":"67"},{"name":"Chopper","price":"49"},{"name":"Sasaki","price":"8"},{"name":"Franky","price":"50"},{"name":"Ylva","price":"1"},{"name":"Johanna","price":"1"},{"name":"Im","price":"1"}],"swap":[{"sell":"Akainu","buy":"Johanna","price":"46"},{"sell":"Otama","buy":"Bijorn","price":"46"},{"sell":"Speed","buy":"Mag","price":"46"}]},{"team_name":"Piggy Squad","team_id":"10607","owner":"@Saccottone","tokens_left":"14","jolly_roger":"https://i.ibb.co/ycJc393x/photo-6023753033948709990-c.jpg","players":[{"name":"Nami","price":"32"},{"name":"Goldberg","price":"21"},{"name":"Stansen","price":"21"},{"name":"Yamato","price":"51"},{"name":"Re Harald","price":"20"},{"name":"Gunko","price":"54"},{"name":"Dory","price":"51"},{"name":"Page One","price":"20"},{"name":"Karsee","price":"12"},{"name":"Scaldi","price":"4"}],"swap":[{"sell":"Kiba","buy":"Page One","price":"46"},{"sell":"Blade","buy":"Scaldi","price":"46"}]},{"team_name":"Kaizoku D. Parutenope","team_id":"10620","owner":"@UncleSamma","tokens_left":"10","jolly_roger":"https://i.ibb.co/YB7MRYHX/photo-5913526443508354127-y.jpg","players":[{"name":"Jinbe","price":"29"},{"name":"Nico Robin","price":"60"},{"name":"Road","price":"29"},{"name":"Hajrudin","price":"86"},{"name":"Zoro","price":"50"},{"name":"Brook","price":"31"},{"name":"Morgans","price":"1"},{"name":"Morley","price":"2"},{"name":"Nekomamushi","price":"1"},{"name":"Dragon","price":"1"}],"swap":"None"},{"team_name":"è tutto sbagliato","team_id":"9034","owner":"@zii_fons","tokens_left":"19","jolly_roger":"https://i.ibb.co/C3pL6By4/0078xvda.png","players":[{"name":"Ulti","price":"4"},{"name":"Saint Kiringam","price":"41"},{"name":"Sanji","price":"50"},{"name":"Sauro","price":"71"},{"name":"Usopp","price":"51"},{"name":"Shamrock Figarland","price":"11"},{"name":"Ange","price":"29"},{"name":"Oimo","price":"15"},{"name":"Koron","price":"8"},{"name":"Bibi","price":"1"}],"swap":[{"sell":"Who's who","buy":"Ulti","price":"46"}]},{"team_name":"I pirati di Picchiatello","team_id":"6095","owner":"@Tonyosuke","tokens_left":"52","jolly_roger":"https://i.ibb.co/WWGMN8X4/60083ca9-b820-42b3-9857-37c2910fb014.jpg","players":[{"name":"Scopper Gaban","price":"30"},{"name":"Ripley","price":"21"},{"name":"Luffy","price":"210"},{"name":"Orso Bartolomew","price":"1"},{"name":"Jewerly Bonney","price":"1"},{"name":"Shanks","price":"5"},{"name":"Lilith (Punk 02)","price":"12"},{"name":"Barbanera","price":"8"},{"name":"Buggy","price":"1"},{"name":"Kuzan - Aokiji","price":"1"}],"swap":[{"sell":"Mihawk","buy":"Buggy","price":"46"}]},{"team_name":"Kyojin Gomblottari","team_id":"9359","owner":"@bombo_100","tokens_left":"8","jolly_roger":"https://i.ibb.co/b5G53Fdj/photo-5915486009452250849-x.jpg","players":[{"name":"Karin","price":"11"},{"name":"Jarul","price":"38"},{"name":"Loki","price":"201"},{"name":"Karasu","price":"1"},{"name":"Sabo","price":"1"},{"name":"Gerd","price":"27"},{"name":"Black Maria","price":"5"},{"name":"Kawamatsu","price":"6"},{"name":"Mosa","price":"1"},{"name":"Ryokugyu - Toro Verde","price":"1"}],"swap":[{"sell":"Seraphim Doflamingo","buy":"Karin","price":"46"},{"sell":"Saint Shepherd Ju Peter","buy":"Sabo","price":"46"},{"sell":"Raizou","buy":"Karasu","price":"46"}]}];
 
-// The chapters array, which holds the data
-const chapters = //CHAPTER_DATA;
-let currentSelectedPlayer = null;
-let currentSelectedTeam = null;
-let currentSelectedLi = null;
-let currentChapterIndex = null;
-const scoresList = document.querySelector('.scores-list');
-const scoreSelect = document.getElementById('scoreSelect');
-const playerSelect = document.getElementById('playerSelect');
-const tabPanel = document.getElementById('tabPanel');
-const chapterTitle = document.getElementById('chapterTitle'); // Reference to the chapter title
+const roles = ["Capitano", "Vice", "Titolare", "1° riserva", "2° riserva", "3° riserva"];
 
-// Dropdown Items
-const dropdownItems = {"AppFl":{"value":"4","description":"Il personaggio appare in un Flashback"},"AppTag":{"value":"7","description":"Il personaggio appare in una taglia"},"AppUltPag":{"value":"1","description":"Il personaggio appare nell'ultima pagina"},"App":{"value":"3","description":"Il personaggio appare nel capitolo"},"AppCover":{"value":"4","description":"Il personaggio appare nella cover"},"App1Pag":{"value":"1","description":"Il personaggio appare nella prima pagina"},"CadAcq":{"value":"-5","description":"Il personaggio cade in acqua"},"Ener":{"value":"20","description":"Il personaggio fa la Ener Face"},"Occhi":{"value":"3","description":"Il personaggio ha la forma degli occhi particolare"},"Sta":{"value":"-3","description":"Il personaggio è stanco/inerme"},"Strate":{"value":"3","description":"Il personaggio escogita una strategia (deve essere chiara o spiegata da qualcuno)"},"Den":{"value":"3","description":"Il personaggio parla al Lumacofono (o qualsiasi dispositivo simile)"},"Ride":{"value":"3","description":"Il personaggio ride (risata caratteristica)"},"Bru":{"value":"-3","description":"Il personaggio subisce una bruciatura"},"Nom":{"value":"1","description":"Il personaggio viene nominato (ma non appare)"},"Tit":{"value":"3","description":"Il Titolo fa riferimento al personaggio"},"ManFru":{"value":"10","description":"Il personaggio mangia un frutto del Diavolo"},"Muo":{"value":"-20","description":"Il personaggio muore"},"ParSc":{"value":"1","description":"Il personaggio partecipa ad uno scontro"},"PerSc":{"value":"-4","description":"Il personaggio perde uno scontro"},"Pian":{"value":"-2","description":"Il personaggio piange"},"App0p":{"value":"5","description":"Il personaggio è il primissimo personaggio ad apparire"},"SalvQual":{"value":"3","description":"Il personaggio salva qualcuno"},"Trasf":{"value":"6","description":"Il personaggio si trasforma"},"SubCol":{"value":"-2","description":"Il personaggio subisce un colpo"},"Svie":{"value":"-4","description":"Il personaggio sviene"},"MVP":{"value":"5","description":"Il personaggio è l'MVP del capitolo"},"Kill":{"value":"10","description":"Il personaggio uccide qualcuno"},"AppUlt":{"value":"5","description":"Il personaggio è l'ultimo personaggio ad apparire"},"Haki":{"value":"3","description":"Il personaggio utilizza l'Haki"},"UtTec":{"value":"1","description":"Il personaggio utilizza una tecnica"},"Avvel":{"value":"-4","description":"Il personaggio viene avvelenato"},"Catt":{"value":"-3","description":"Il personaggio viene catturato/imprigionato"},"Fer":{"value":"-5","description":"Il personaggio viene ferito"},"Mut":{"value":"-7","description":"Il personaggio viene mutilato"},"Scop":{"value":"-2","description":"Il personaggio viene scoperto"},"Vinc":{"value":"7","description":"Il personaggio vince uno scontro"}};
-// Function to populate chapter tabs
-function createTabs() {
-    currentChapterIndex = -1; 
-    chapters.forEach((chapter, index) => {
-        // Check if the chapter data exsist
-        if(chapter.state === "None"){
-            return;
+function populateTabs() {
+    const tabPanel = document.getElementById("tabPanel");
+    tabPanel.innerHTML = "";
+    
+    matchesData.forEach(chapter => {
+        if(chapter.squads == 'None')
+        {
+            chapter.squads = [];
+            teamsData.forEach(team => {
+                let actualTeamData = {"team_id":team.team_id, "total_score":0.0, "players":[]};
+                team.players.forEach(player => {
+                    actualTeamData.players.push({"name":player.name,"role":"Titolare","score":"None"});
+                });
+                chapter.squads.push(actualTeamData);
+            });
         }
-        // For valid chapters change the scores into an empty object
+
         chapter.squads.forEach(team => {
             team.players.forEach(player => {
                 if (player.score === "None") {
@@ -29,43 +29,172 @@ function createTabs() {
                 }
             });
         });
-        // Count the current index
-        currentChapterIndex += 1;
-        const tabItem = document.createElement('div');
-        tabItem.classList.add('tab-item');
-        tabItem.textContent = `Chapter ${chapter.chapter}`;
-        tabItem.setAttribute('data-index', index);
 
-        tabItem.addEventListener('click', () => selectChapter(index));
-        tabPanel.appendChild(tabItem);
-        // Update chapter title dynamically
-        chapterTitle.textContent = `Chapter ${chapters[index].chapter}`;
+        const tab = document.createElement("div");
+        tab.classList.add("tab-item");
+        tab.textContent = "Chapter " + chapter.chapter;
+        tab.onclick = () => {
+            document.querySelectorAll(".tab-item").forEach(t => t.classList.remove("active"));
+            tab.classList.add("active");
+            loadTeamsForChapter(chapter);
+        };
+        tabPanel.appendChild(tab);
     });
-    selectChapter(currentChapterIndex);
 }
 
-// Function to handle selecting a chapter
-function selectChapter(index) {
-    // Update the active tab
-    document.querySelectorAll('.tab-item').forEach(tab => tab.classList.remove('active'));
-    document.querySelector(`.tab-item[data-index="${index}"]`).classList.add('active');
-
-    // Update the current chapter index
-    currentChapterIndex = index;
-
-    // Update chapter title dynamically
-    chapterTitle.textContent = `Chapter ${chapters[index].chapter}`;
-
-    // Update the player list for the selected chapter
-    updatePlayersDropdown();
-    updateSelectedPlayer();
-    updateScoresList();
+function loadTeamsForChapter(chapter) {
+    document.getElementById("chapterTitle").textContent = "Chapter " + chapter.chapter;
+    document.getElementById("chapterStatus").value = chapter.state || "None";
+    document.getElementById("chapterStatus").onchange = function() {
+        chapter.state = this.value;
+    };
+    const teamsContainer = document.getElementById("teamsContainer");
+    teamsContainer.innerHTML = "";
+    chapter.squads.forEach(team => {
+        const teamDiv = renderTeams(chapter,team);
+        teamsContainer.appendChild(teamDiv);
+    });
 }
 
-// Function to log and copy JSON to clipboard
+function orderTeamsPlayers(){
+    
+    matchesData.forEach(chapter => {
+
+        chapter.squads.forEach(team => {
+
+            for (let i = 0; i < team.players.length; i++) {
+                if (team.players[i].role === "Capitano") {
+                    let temp = team.players[0];
+                    team.players[0] = team.players[i];
+                    team.players[i] = temp;
+                } else if (team.players[i].role === "Vice") {
+                    let temp = team.players[1];
+                    team.players[1] = team.players[i];
+                    team.players[i] = temp;
+                } else if (team.players[i].role.includes("1")) {
+                    let temp = team.players[team.players.length - 3];
+                    team.players[team.players.length - 3] = team.players[i];
+                    team.players[i] = temp;
+                } else if (team.players[i].role.includes("2")) {
+                    let temp = team.players[team.players.length - 2];
+                    team.players[team.players.length - 2] = team.players[i];
+                    team.players[i] = temp;
+                } else if (team.players[i].role.includes("3")) {
+                    let temp = team.players[team.players.length - 1];
+                    team.players[team.players.length - 1] = team.players[i];
+                    team.players[i] = temp;
+                }
+            };
+        });
+
+    });
+}
+
+function renderTeams(chapter,team) {
+    const teamDiv = document.createElement("div");
+    teamDiv.classList.add("team");
+    // teamDiv.innerHTML = `<h2>Team ${team.team_id} - Score: ${team.total_score}</h2>`;
+    const playerList = document.createElement("ul");
+    playerList.classList.add("player-list");
+
+    players_score_counter = 0;
+    team.total_score = 0;
+    team.players.forEach(player => {
+        let totalScore = Object.values(player.score || {}).reduce((a, b) => a + parseFloat(b || 0), 0);
+        if (Object.keys(player.score).length > 0) { // if player hasn't scored skip this part
+            players_score_counter += 1;
+            // totalScore = Object.values(player.score || {}).reduce((a, b) => a + parseFloat(b || 0), 0);
+            if (player.role === "Capitano") {
+                totalScore *= 2;
+            } else if (player.role === "Vice") {
+                totalScore *= 1.5;
+            } else if (player.role.includes("riserva") && players_score_counter > 7) {
+                totalScore = 0;
+            }
+        }
+        team.total_score += totalScore; // Add the player total score to the team total score
+        const playerItem = document.createElement("li");
+        playerItem.classList.add("player-item");
+        playerItem.dataset.name = player.name.toLowerCase();
+        playerItem.innerHTML = `
+        <div class="player-info">
+            <span>${player.name}</span>
+            <select class="role-dropdown">
+                ${roles.map(role => `<option value="${role}" ${player.role === role ? 'selected' : ''}>${role}</option>`).join('')}
+            </select>
+            <div class="score-search">
+                <datalist id="score-suggestions">
+                    ${Object.entries(scores || {}).map(([key, value]) => `<option value="${key}">${scores[key].description}</option>`).join('')}
+                </datalist>
+                <input id="score-${chapter.chapter}-${player.name}" type="text" autoComplete="on" list="score-suggestions"/> 
+                <button class="add-button" onclick="addScore('${chapter.chapter}','${player.name}')">+</button>
+            </div>
+            <span class="total-score">Total: ${totalScore}</span>
+            </div>
+            <ul class="score-list">
+                ${Object.entries(player.score || {}).map(([key, value]) => `<li>${scores[key]["description"]}: ${value} 
+                    <button class="trash-bin" onclick="deleteScore('${chapter.chapter}','${player.name}','${key}')">🗑️</button></li>`).join('')}
+                </ul>
+                `;
+        playerItem.querySelector(".role-dropdown").addEventListener("change", function() {
+            player.role = this.value;
+        });
+        playerList.appendChild(playerItem);
+    });
+    teamDiv.innerHTML = `<h2>Team ${team.team_id} - Score: ${team.total_score}</h2>`;
+    teamDiv.appendChild(playerList);
+    return teamDiv;
+}
+
+function deleteScore(chapterId, playerName, scoreKey) {
+    console.log(chapterId + " => removing {" + scoreKey + "} from " + playerName);
+    matchesData.forEach(chapter => {
+        if (chapterId === chapter.chapter) {
+            chapter.squads.forEach(team => {
+                team.players.forEach(player => {
+                    if (playerName === player.name) {
+                        delete player.score[scoreKey];
+                        loadTeamsForChapter(chapter);
+                        return;
+                    }
+                });
+            });
+        }
+    });
+}
+
+function addScore(chapterId, playerName) {
+    let scoreQuery = "score-" + chapterId + "-" + playerName;
+    const scoreKey = document.getElementById(scoreQuery).value;
+
+    console.log(chapterId + " => adding {" + scoreKey + "} to " + playerName);
+    matchesData.forEach(chapter => {
+        if (chapterId === chapter.chapter) {
+            chapter.squads.forEach(team => {
+                team.players.forEach(player => {
+                    if (playerName === player.name) {
+                        player.score[scoreKey] = scores[scoreKey].value;
+                        loadTeamsForChapter(chapter);
+                        return;
+                    }
+                });
+            });
+        }
+    });
+}
+
+document.getElementById("searchBox").addEventListener("input", function() {
+    let filter = this.value.toLowerCase();
+    document.querySelectorAll(".player-item").forEach(player => {
+        let teamDiv = player.closest(".team");
+        player.style.display = player.dataset.name.includes(filter) ? "block" : "none";
+        teamDiv.style.display = teamDiv.querySelector(".player-item[style='display: block;']") ? "block" : "none";
+    });
+});
+
 document.getElementById('saveButton').addEventListener('click', function() {
     // Convert empty objects to None
-    chapters.forEach(chapter => {
+    matchesData.forEach(chapter => {
         // Check if the chapter data exsist
         if(chapter.state === "None"){
             return;
@@ -87,11 +216,11 @@ document.getElementById('saveButton').addEventListener('click', function() {
     // Create the payload with the token and JSON data
     const dataToSend = {
         token: token,
-        jsonData: JSON.stringify(chapters)
+        jsonData: JSON.stringify(matchesData)
     };
 
     // Make the POST request using fetch
-    fetch('https://utaxx3uzbb.execute-api.eu-north-1.amazonaws.com/rank_validation', {
+    fetch('https://lhkbtday6kadh4pmzfnemlpqzq0plkki.lambda-url.eu-north-1.on.aws/rank_validation', {
         method: 'POST',
         // mode: 'no-cors',
         mode: 'same-origin',
@@ -109,7 +238,7 @@ document.getElementById('saveButton').addEventListener('click', function() {
     });
 
     // Convert None to empty objects
-    chapters.forEach(chapter => {
+    matchesData.forEach(chapter => {
         // Check if the chapter data exsist
         if(chapter.state === "None"){
             return;
@@ -125,301 +254,4 @@ document.getElementById('saveButton').addEventListener('click', function() {
     });
 });
 
-function updatePlayersDropdown(){
-    
-    const chapter = chapters[currentChapterIndex];
-
-    playerSelect.innerHTML = '<option value="">-- Select a Player --</option>'; // Clear the player dropdown
-
-    chapter.squads.forEach(teamData => {
-        teamData.players.forEach(player => {
-            // Add players to the player dropdown
-            const playerOption = document.createElement('option');
-            playerOption.value = player.name;
-            playerOption.textContent = player.name;
-            playerSelect.appendChild(playerOption);
-        });
-    });
-}
-
-// Function to update the player list and dropdown for the selected chapter
-function updateScoresList() {
-    const chapter = chapters[currentChapterIndex];
-
-    // Clear the existing content
-    scoresList.innerHTML = '';
-    scoreSelect.innerHTML = '<option value="">-- Select an item --</option>';
-
-    // Populate the names list
-    chapter.squads.forEach(teamData => {
-        const teamDiv = document.createElement('div');
-        const teamIdSpan = document.createElement('span');
-        teamIdSpan.style.fontWeight = 'bold';
-        teamData.total_score = calculateTotalScore(teamData.players);
-        teamIdSpan.textContent = `Team ID: ${teamData.team_id} | Total Score: ${teamData.total_score} `;
-        teamDiv.appendChild(teamIdSpan);
-        teamDiv.setAttribute('team-id', teamData.team_id);
-        scoresList.appendChild(teamDiv);
-
-        teamData.players.forEach(player => {
-            const li = document.createElement('li');
-            const playerScore = calculatePlayerScore(player);
-            li.textContent = `${player.name} (${player.role}) ${playerScore}`;
-            if (player.role === "Capitano") {
-                li.textContent += " x 2 => " + (playerScore*2);
-            } else if (player.role === "Vice") {
-                li.textContent += " x 1.5 => " + (playerScore*1.5); 
-            }
-            li.setAttribute('data-name', player.name);
-            li.setAttribute('team-id', teamData.team_id);
-            if (playerScore === 0) {
-                li.setAttribute('class', "hide");
-            }
-            teamDiv.appendChild(li);
-            addScoresToList(player.name, teamData.team_id);
-        });
-    });
-
-    // Populate the scores dropdown
-    Object.entries(dropdownItems).forEach(([key, item]) => {
-        const option = document.createElement('option');
-        option.value = item.value;
-        option.textContent = item.description + ` ` + item.value;
-        option.setAttribute('data-key', key);
-        scoreSelect.appendChild(option);
-    });
-}
-
-// Function to calculate the score for a player
-function calculatePlayerScore(player) {
-    let playerScore = 0;
-
-    Object.entries(player.score).forEach(([key, value]) => {
-        if (dropdownItems[key]) {
-            let scoreValue = parseFloat(dropdownItems[key].value) || 0;
-            playerScore += scoreValue;
-        }
-    });
-
-    return playerScore;
-}
-
-// Function to calculate the total score for a team
-function calculateTotalScore(players) {
-    let totalScore = 0;
-
-    players.forEach(player => {
-        Object.entries(player.score).forEach(([key, value]) => {
-            if (dropdownItems[key]) {
-                let scoreValue = parseFloat(dropdownItems[key].value) || 0;
-
-                // Apply role-based multiplier
-                if (player.role === "Capitano") {
-                    scoreValue *= 2; // Double the score for Capitano
-                } else if (player.role === "Vice") {
-                    scoreValue *= 1.5; // Multiply by 1.5 for Vice
-                }
-
-                totalScore += scoreValue;
-            }
-        });
-    });
-
-    return totalScore;
-}
-
-// Function to update the selected player when the user selects a player from the dropdown
-function updateSelectedPlayer() {
-    const selectedPlayer = playerSelect.value;
-
-    if (selectedPlayer) {
-        currentSelectedPlayer = selectedPlayer;
-        console.log(`Player selected: ${selectedPlayer}`);
-        
-        // Clear selection for all list items
-        document.querySelectorAll('.scores-list li').forEach(li => li.classList.remove('selected'));
-        
-        // Mark the selected item as selected
-        const playerLi = document.querySelector(`[data-name="${selectedPlayer}"]`);
-        playerLi.classList.add('selected');
-        currentSelectedLi = playerLi;  // Keep reference to the clicked li
-        currentSelectedTeam = playerLi.getAttribute('team-id');
-        // Update dropdown to reflect current selection
-        updateScoresDropdown();
-    } else {
-        currentSelectedPlayer = null; // Reset if no player is selected
-    }
-}
-
-// Event delegation for deleting sub-elements (associated items)
-scoresList.addEventListener('click', function(e) {
-    // Handle trash bin click
-    if (e.target && e.target.classList.contains('trash-bin')) {
-        const trashBin = e.target;  // The trash button itself
-        const associatedLi = trashBin.parentElement;  // The li that the trash bin belongs to
-
-        // Get the associated name and key
-        const associatedName = associatedLi.getAttribute('data-associated-name');
-        const associatedItemKey = associatedLi.getAttribute('data-associated-key');
-        const associatedTeam = associatedLi.parentElement.getAttribute('team-id');
-
-        // Remove the associated item from the player's score map
-        const player = chapters[currentChapterIndex].squads.find(teamData => teamData.team_id === associatedTeam)
-            .players.find(player => player.name === associatedName);
-        delete player.score[associatedItemKey];
-
-        // Remove the associated item from the DOM
-        associatedLi.remove();
-
-        // Re-enable the item in the dropdown
-        enableItemInDropdown(associatedItemKey);
-
-        // Update the total score
-        updateScoresList();
-        updateSelectedPlayer();
-
-        // Print updated associations
-        console.log(`Updated score for ${associatedName}:`, player.score);
-    }
-});
-
-// Function to add scores to a player's list
-function addScoresToList(playerName, teamId) {
-    const player = chapters[currentChapterIndex].squads.find(teamData => teamData.team_id === teamId)
-        .players.find(player => player.name === playerName);
-
-    if (player && player.score) {
-        const playerScores = player.score;
-
-        const playerLi = document.querySelector(`[data-name="${playerName}"]`);
-
-        if (playerLi) {
-            Object.entries(playerScores).forEach(([key, value]) => {
-                let itemDescription;
-                if (dropdownItems[key]) {
-                    itemDescription = dropdownItems[key].description + ` ` + dropdownItems[key].value;
-                } else {
-                    itemDescription = 'Unknown Item';
-                }
-                
-                const scoreLi = document.createElement('li');
-                scoreLi.textContent = itemDescription;
-
-                scoreLi.setAttribute('data-associated-name', playerName);
-                scoreLi.setAttribute('data-associated-key', key);
-
-                scoreLi.classList.add('associated-item');
-
-                const trashBin = document.createElement('button');
-                trashBin.textContent = '🗑️';
-                trashBin.classList.add('trash-bin');
-                scoreLi.appendChild(trashBin);
-
-                playerLi.appendChild(scoreLi);
-            });
-        }
-    }
-}
-
-function addNameToList() {
-    const selectedItemValue = document.getElementById("scoreSelect").value;
-    const selectedItemKey = document.getElementById("scoreSelect").selectedOptions[0].getAttribute('data-key');  // Get the key of the selected item
-
-    if (currentSelectedPlayer && selectedItemValue) {
-        // Check if the item is already added to the player's score map
-        const player = chapters[currentChapterIndex].squads.find(teamData => teamData.team_id === currentSelectedTeam).players.find(p => p.name === currentSelectedPlayer);
-        if (player.score[selectedItemKey]) {
-            alert("This item has already been added.");
-            return;
-        }
-
-        // Create a new associated item and append to the selected player's list
-        const associatedLi = document.createElement("li");
-        associatedLi.textContent = dropdownItems[selectedItemKey].description;
-
-        // Add the associated name as a custom attribute to the li
-        associatedLi.setAttribute('data-associated-name', currentSelectedPlayer);
-        associatedLi.setAttribute('data-associated-key', selectedItemKey);
-
-        // Create a trash bin button and append it to the associated item
-        const trashBin = document.createElement('button');
-        trashBin.textContent = '🗑️';  // Trash bin icon
-        trashBin.classList.add('trash-bin');
-        associatedLi.appendChild(trashBin);
-
-        associatedLi.classList.add("associated-item");
-
-        // Add the associated item to the selected player's score map
-        chapters[currentChapterIndex].squads.find(teamData => teamData.team_id === currentSelectedTeam).players.find(player => player.name === currentSelectedPlayer).score[selectedItemKey] = dropdownItems[selectedItemKey].value;
-
-        // Add the associated item to the selected player's list in the DOM
-        currentSelectedLi.appendChild(associatedLi);
-
-        // Update dropdown state to disable the selected item for this player
-        removeItemFromDropdown(selectedItemKey);
-
-        // Clear the dropdown after selection
-        document.getElementById("scoreSelect").value = "";
-
-        updateScoresDropdown();
-        updateScoresList();
-        updateSelectedPlayer();
-        console.log(`Updated score for ${currentSelectedPlayer}:`, chapters[currentChapterIndex].squads.find(teamData => teamData.team_id === currentSelectedTeam).players.find(player => player.name === currentSelectedPlayer).score);
-
-    } else {
-        updateScoresList();
-        alert("Please select a player on the left and an item from the dropdown.");
-    }
-}
-
-function removeItemFromDropdown(itemKey) {
-    const options = scoreSelect.options;
-    for (let i = 1; i < options.length; i++) {
-        if (options[i].getAttribute('data-key') === itemKey) {
-            options[i].disabled = true;
-            options[i].style.color = "gray";
-            break;
-        }
-    }
-    console.log(chapters[currentChapterIndex].squads.find(teamData => teamData.team_id === currentSelectedTeam).players);
-}
-
-function enableItemInDropdown(itemKey) {
-    const options = scoreSelect.options;
-    for (let i = 1; i < options.length; i++) {
-        if (options[i].getAttribute('data-key') === itemKey) {
-            options[i].disabled = false;
-            options[i].style.color = "black";
-            break;
-        }
-    }
-}
-
-function updateScoresDropdown() {
-    const options = scoreSelect.options;
-
-    // Re-enable all options before updating
-    for (let i = 1; i < options.length; i++) {
-        options[i].disabled = false;
-        options[i].style.color = "black";
-    }
-
-    // Disable items already selected for the current player using key
-    if (currentSelectedPlayer) {
-        const player = chapters[currentChapterIndex].squads.find(teamData => teamData.team_id === currentSelectedTeam).players.find(p => p.name === currentSelectedPlayer);
-        Object.keys(player.score).forEach(key => {
-            for (let i = 1; i < options.length; i++) {
-                if (options[i].getAttribute('data-key') === key) {
-                    options[i].disabled = true;
-                    options[i].style.color = "gray";
-                    break;
-                }
-            }
-        });
-    }
-}
-
-// Initialize the page
-createTabs();
-updateScoresList();
-updatePlayersDropdown();
+populateTabs();
