@@ -28,6 +28,8 @@
         const scores = //SCORES_LIST;
         let matchesData = //MATCHES_LIST;
         let teamsData = //TEAMS_LIST;
+        
+        let teams_names = new Map();
 
         function showView(view) {
             mainBody = document.getElementById("main-body");
@@ -67,6 +69,12 @@
 
         // webapp main
         document.addEventListener("DOMContentLoaded", function() {
+            // Generate the mapping for teams id/name
+            for (let team in teamsData){
+                teams_names.set(teamsData[team]['team_id'],teamsData[team]['team_name'])
+            }
+
+            // Load the main page
             loadPage('Classifica');
         });
 

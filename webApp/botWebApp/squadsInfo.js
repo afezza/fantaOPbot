@@ -39,11 +39,6 @@ function chapterSquadsSelection(value){
     squadSummary = document.getElementById("squads-summary");
     squadSummary.innerHTML = ''
     
-    let teams_names = new Map();
-    for (let team in teamsData){
-        teams_names.set(teamsData[team]['team_id'],teamsData[team]['team_name'])
-    }
-    
     for (let match in matchesData)
     {
         if(matchesData[match]['chapter'] != value) {continue;}
