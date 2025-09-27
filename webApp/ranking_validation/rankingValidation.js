@@ -1,13 +1,18 @@
 const scores = //SCORES_ARRAY;
 let matchesData = //CHAPTER_DATA;
 let teamsData = //TEAMS_DATA;
-// let teamsData = [{"team_name":"Gli animaletti del bosco","team_id":"9346","owner":"@Skizzo_lucido","tokens_left":"0","jolly_roger":"https://i.ibb.co/PZ2Rq3sJ/photo-5829911947175380908-c.jpg","players":[{"name":"Saint Sommers","price":"50"},{"name":"Bijorn","price":"35"},{"name":"Mag","price":"38"},{"name":"Brogy","price":"67"},{"name":"Chopper","price":"49"},{"name":"Sasaki","price":"8"},{"name":"Franky","price":"50"},{"name":"Ylva","price":"1"},{"name":"Johanna","price":"1"},{"name":"Im","price":"1"}],"swap":[{"sell":"Akainu","buy":"Johanna","price":"46"},{"sell":"Otama","buy":"Bijorn","price":"46"},{"sell":"Speed","buy":"Mag","price":"46"}]},{"team_name":"Piggy Squad","team_id":"10607","owner":"@Saccottone","tokens_left":"14","jolly_roger":"https://i.ibb.co/ycJc393x/photo-6023753033948709990-c.jpg","players":[{"name":"Nami","price":"32"},{"name":"Goldberg","price":"21"},{"name":"Stansen","price":"21"},{"name":"Yamato","price":"51"},{"name":"Re Harald","price":"20"},{"name":"Gunko","price":"54"},{"name":"Dory","price":"51"},{"name":"Page One","price":"20"},{"name":"Karsee","price":"12"},{"name":"Scaldi","price":"4"}],"swap":[{"sell":"Kiba","buy":"Page One","price":"46"},{"sell":"Blade","buy":"Scaldi","price":"46"}]},{"team_name":"Kaizoku D. Parutenope","team_id":"10620","owner":"@UncleSamma","tokens_left":"10","jolly_roger":"https://i.ibb.co/YB7MRYHX/photo-5913526443508354127-y.jpg","players":[{"name":"Jinbe","price":"29"},{"name":"Nico Robin","price":"60"},{"name":"Road","price":"29"},{"name":"Hajrudin","price":"86"},{"name":"Zoro","price":"50"},{"name":"Brook","price":"31"},{"name":"Morgans","price":"1"},{"name":"Morley","price":"2"},{"name":"Nekomamushi","price":"1"},{"name":"Dragon","price":"1"}],"swap":"None"},{"team_name":"è tutto sbagliato","team_id":"9034","owner":"@zii_fons","tokens_left":"19","jolly_roger":"https://i.ibb.co/C3pL6By4/0078xvda.png","players":[{"name":"Ulti","price":"4"},{"name":"Saint Kiringam","price":"41"},{"name":"Sanji","price":"50"},{"name":"Sauro","price":"71"},{"name":"Usopp","price":"51"},{"name":"Shamrock Figarland","price":"11"},{"name":"Ange","price":"29"},{"name":"Oimo","price":"15"},{"name":"Koron","price":"8"},{"name":"Bibi","price":"1"}],"swap":[{"sell":"Who's who","buy":"Ulti","price":"46"}]},{"team_name":"I pirati di Picchiatello","team_id":"6095","owner":"@Tonyosuke","tokens_left":"52","jolly_roger":"https://i.ibb.co/WWGMN8X4/60083ca9-b820-42b3-9857-37c2910fb014.jpg","players":[{"name":"Scopper Gaban","price":"30"},{"name":"Ripley","price":"21"},{"name":"Luffy","price":"210"},{"name":"Orso Bartolomew","price":"1"},{"name":"Jewerly Bonney","price":"1"},{"name":"Shanks","price":"5"},{"name":"Lilith (Punk 02)","price":"12"},{"name":"Barbanera","price":"8"},{"name":"Buggy","price":"1"},{"name":"Kuzan - Aokiji","price":"1"}],"swap":[{"sell":"Mihawk","buy":"Buggy","price":"46"}]},{"team_name":"Kyojin Gomblottari","team_id":"9359","owner":"@bombo_100","tokens_left":"8","jolly_roger":"https://i.ibb.co/b5G53Fdj/photo-5915486009452250849-x.jpg","players":[{"name":"Karin","price":"11"},{"name":"Jarul","price":"38"},{"name":"Loki","price":"201"},{"name":"Karasu","price":"1"},{"name":"Sabo","price":"1"},{"name":"Gerd","price":"27"},{"name":"Black Maria","price":"5"},{"name":"Kawamatsu","price":"6"},{"name":"Mosa","price":"1"},{"name":"Ryokugyu - Toro Verde","price":"1"}],"swap":[{"sell":"Seraphim Doflamingo","buy":"Karin","price":"46"},{"sell":"Saint Shepherd Ju Peter","buy":"Sabo","price":"46"},{"sell":"Raizou","buy":"Karasu","price":"46"}]}];
 
 const roles = ["Capitano", "Vice", "Titolare", "1° riserva", "2° riserva", "3° riserva"];
+
+let teams_names = new Map();
 
 function populateTabs() {
     const tabPanel = document.getElementById("tabPanel");
     tabPanel.innerHTML = "";
+
+    for (let team in teamsData){
+        teams_names.set(teamsData[team]['team_id'],teamsData[team]['team_name'])
+    }
     
     matchesData.forEach(chapter => {
         if(chapter.squads == 'None')
@@ -20,6 +25,10 @@ function populateTabs() {
                 });
                 chapter.squads.push(actualTeamData);
             });
+        }
+        else 
+        {
+            chapter.squads.sort((a, b) => parseFloat(b.total_score) - parseFloat(a.total_score));
         }
 
         chapter.squads.forEach(team => {
@@ -90,29 +99,32 @@ function orderTeamsPlayers(){
     });
 }
 
+function calculatePlayerScore(player) {
+    let playerScore = Object.values(player.score || {}).reduce((a, b) => a + parseFloat(b || 0), 0);
+    if (Object.keys(player.score).length > 0) { // if player hasn't scored skip this part
+        players_score_counter += 1;
+        if (player.role === "Capitano") {
+            playerScore *= 2;
+        } else if (player.role === "Vice") {
+            playerScore *= 1.5;
+        } else if (player.role.includes("riserva") && players_score_counter > 7) {
+            playerScore = 0;
+        }
+    }
+    return playerScore;
+}
+
 function renderTeams(chapter,team) {
     const teamDiv = document.createElement("div");
     teamDiv.classList.add("team");
-    // teamDiv.innerHTML = `<h2>Team ${team.team_id} - Score: ${team.total_score}</h2>`;
     const playerList = document.createElement("ul");
     playerList.classList.add("player-list");
 
     players_score_counter = 0;
     team.total_score = 0;
     team.players.forEach(player => {
-        let totalScore = Object.values(player.score || {}).reduce((a, b) => a + parseFloat(b || 0), 0);
-        if (Object.keys(player.score).length > 0) { // if player hasn't scored skip this part
-            players_score_counter += 1;
-            // totalScore = Object.values(player.score || {}).reduce((a, b) => a + parseFloat(b || 0), 0);
-            if (player.role === "Capitano") {
-                totalScore *= 2;
-            } else if (player.role === "Vice") {
-                totalScore *= 1.5;
-            } else if (player.role.includes("riserva") && players_score_counter > 7) {
-                totalScore = 0;
-            }
-        }
-        team.total_score += totalScore; // Add the player total score to the team total score
+        player_score = calculatePlayerScore(player);
+        team.total_score += player_score; // Add the player total score to the team total score
         const playerItem = document.createElement("li");
         playerItem.classList.add("player-item");
         playerItem.dataset.name = player.name.toLowerCase();
@@ -129,20 +141,31 @@ function renderTeams(chapter,team) {
                 <input id="score-${chapter.chapter}-${player.name}" type="text" autoComplete="on" list="score-suggestions"/> 
                 <button class="add-button" onclick="addScore('${chapter.chapter}','${player.name}')">+</button>
             </div>
-            <span class="total-score">Total: ${totalScore}</span>
+            <span class="total-score" id="score-${chapter.chapter}-${player.name}-value">Total: ${player_score}</span>
             </div>
-            <ul class="score-list">
+            <ul class="score-list" id="score-list-${chapter.chapter}-${player.name}">
                 ${Object.entries(player.score || {}).map(([key, value]) => `<li>${scores[key]["description"]}: ${value} 
                     <button class="trash-bin" onclick="deleteScore('${chapter.chapter}','${player.name}','${key}')">🗑️</button></li>`).join('')}
                 </ul>
                 `;
         playerItem.querySelector(".role-dropdown").addEventListener("change", function() {
             player.role = this.value;
+            team.total_score -= player_score;
+            player_score = calculatePlayerScore(player);
+            playerItem.querySelector(".total-score").innerText = `Total: ${player_score}`
         });
         playerList.appendChild(playerItem);
     });
-    teamDiv.innerHTML = `<h2>Team ${team.team_id} - Score: ${team.total_score}</h2>`;
+    teamDiv.innerHTML = `<h2>${teams_names.get(team.team_id)} - Score: ${team.total_score}</h2>`;
     teamDiv.appendChild(playerList);
+
+    let filter = document.getElementById("searchBox").value.toLowerCase();
+    teamDiv.querySelectorAll(".player-item").forEach(player => {
+        let playerTeamDiv = player.closest(".team");
+        player.style.display = player.dataset.name.includes(filter) ? "block" : "none";
+        playerTeamDiv.style.display = playerTeamDiv.querySelector(".player-item[style='display: block;']") ? "block" : "none";
+    });
+
     return teamDiv;
 }
 
@@ -164,8 +187,7 @@ function deleteScore(chapterId, playerName, scoreKey) {
 }
 
 function addScore(chapterId, playerName) {
-    let scoreQuery = "score-" + chapterId + "-" + playerName;
-    const scoreKey = document.getElementById(scoreQuery).value;
+    const scoreKey = document.getElementById(`score-${chapterId}-${playerName}`).value;
 
     console.log(chapterId + " => adding {" + scoreKey + "} to " + playerName);
     matchesData.forEach(chapter => {
