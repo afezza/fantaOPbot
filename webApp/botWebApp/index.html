@@ -21,6 +21,7 @@
     <script src="https://afezza.github.io/fantaOPbot/webApp/botWebApp/classificationInfo.js"></script>
     <script src="https://afezza.github.io/fantaOPbot/webApp/botWebApp/scoresInfo.js"></script>
     <script src="https://afezza.github.io/fantaOPbot/webApp/botWebApp/squadsInfo.js"></script>
+    <script src="https://afezza.github.io/fantaOPbot/webApp/botWebApp/teamsInfo.js"></script> 
 
     <script src="https://cdn.anychart.com/releases/8.10.0/js/anychart-bundle.min.js"></script>
     
@@ -39,13 +40,19 @@
 
         function loadPage(selectedPage) {
 
+            // change main-body dynamically according the selected team
+            for (let [key, value] of teams_names) {
+                if (selectedPage === key) {
+                    showView(loadTeamsInfo(key));
+                    return;
+                }
+            }
+
+            // If the selection was not about teams 
             // change main-body dynamically according the selected page 
             if (selectedPage === 'Classifica') {
                 showView(loadClassificationInfo());
                 createClassificationChart();
-            } 
-            else if (selectedPage === 'Squadre') {
-                // selectedView = loadTeamInfo(pageViews);
             } 
             else if (selectedPage === 'Personaggi') {
                 // selectedView = loadPlayersInfo(pageViews);
@@ -74,6 +81,8 @@
                 teams_names.set(teamsData[team]['team_id'],teamsData[team]['team_name'])
             }
 
+            // Generate team names for the navbar
+            generateNavbarTeamsDropdown();
             // Load the main page
             loadPage('Classifica');
         });
@@ -86,7 +95,10 @@
                 <div class="collapse navbar-collapse justify-content-end" id="navbar-collapse-toggle">
                 <ul class="navbar-nav ml-auto">
                     <li class="nav-item"> <a class="nav-link" href="#" data-bs-toggle="collapse" data-bs-target=".navbar-collapse.show" onclick="loadPage('Classifica')"><span>Classifica</span></a></li>
-                    <li class="nav-item"> <a class="nav-link" href="#" data-bs-toggle="collapse" data-bs-target=".navbar-collapse.show" onclick="loadPage('Squadre')"><span>Squadre</span></a></li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbar-teams-dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">Squadre</a>
+                        <ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="navbar-teams-dropdown" id="teams-dropdown"></ul>
+                    </li>
                     <li class="nav-item"> <a class="nav-link" href="#" data-bs-toggle="collapse" data-bs-target=".navbar-collapse.show" onclick="loadPage('Personaggi')"><span>Personaggi</span></a></li>
                     <li class="nav-item"> <a class="nav-link" href="#" data-bs-toggle="collapse" data-bs-target=".navbar-collapse.show" onclick="loadPage('Formazioni')"><span>Formazioni</span></a></li>
                     <li class="nav-item"> <a class="nav-link" href="#" data-bs-toggle="collapse" data-bs-target=".navbar-collapse.show" onclick="loadPage('Punteggi')"><span>Punteggi</span></a></li>
