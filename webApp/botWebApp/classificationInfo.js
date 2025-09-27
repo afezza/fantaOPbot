@@ -103,7 +103,7 @@ function createClassificationChart(){
         {
             document.getElementById("glob-champ-jolly").src = teamsData[team]['jolly_roger']
         } 
-        else if(teamsData[team]['team_name'] === last_chap_champ.name)
+        if(teamsData[team]['team_name'] === last_chap_champ.name)
         {
             document.getElementById("last-chap-champ-jolly").src = teamsData[team]['jolly_roger']
         }
