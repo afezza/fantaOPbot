@@ -10,7 +10,7 @@ function loadSquadsInfo() {
                     <h4 class="card-title col">Seleziona il capitolo</h4>`
                     
                     let selectHtlm = `<select class="form-select col" aria-label="Chapter selection" id="squad-chapter-selection" onchange="chapterSquadsSelection(this.value)">`
-                    for (let match = matchesData.length-1; match > 0; match--)
+                    for (let match = matchesData.length-1; match >= 0; match--)
                     {
                         if(matchesData[match]['state'] === "None") {continue;}
                     
