@@ -30,6 +30,7 @@
         let teamsData = //TEAMS_LIST;
         
         let teams_names = new Map();
+        let teams_classification = [];
 
         function showView(view) {
             mainBody = document.getElementById("main-body");
@@ -43,6 +44,7 @@
             for (let [key, value] of teams_names) {
                 if (selectedPage === key) {
                     showView(loadTeamsInfo(key));
+                    createTeamCaptersSummaryChart(key);
                     return;
                 }
             }

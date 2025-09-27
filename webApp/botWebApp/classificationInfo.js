@@ -93,8 +93,14 @@ function createClassificationChart(){
     for (let team in team_name_collection)
     {
         data.push(team_name_collection[team]);
+        teams_classification.push({
+            id : team,
+            value : team_name_collection[team].value,
+            details : team_name_collection[team].details
+        });
     }
     data.sort((a, b) => parseFloat(b.value) - parseFloat(a.value));
+    teams_classification.sort((a, b) => parseFloat(b.value) - parseFloat(a.value));
 
     // Update the champions cards
     for (let team in teamsData) //returns the index
