@@ -37,7 +37,26 @@ function loadTeamsInfo(team_id) {
             <div class="page-element col-sm-6">
                 <div class="card shadow">
                 <div class="card-body">
-                    <p class="h5 text-center">Distanze tra prima e ultima</p>
+                    <div class="row" style="padding-top: 10px;padding-bottom: 10px;">
+                        <div class="col-6">
+                            <div class="text-center"><h6>Dal primo</h6></div>
+                            <div id="progress-from-first-container"></div>
+                        </div>
+                        <div class="col-6">
+                            <div class="text-center"><h6>Dal precedente</h6></div>
+                            <div id="progress-from-prev-container"></div>
+                        </div>
+                    </div>
+                    <div class="row" style="padding-top: 10px;padding-bottom: 10px;">
+                        <div class="col-6">
+                            <div class="text-center"><h6>Dal successivo</h6></div>
+                            <div id="progress-from-next-container"></div>
+                        </div>
+                        <div class="col-6">
+                            <div class="text-center"><h6>Dall'ultimo</h6></div>
+                            <div id="progress-from-last-container"></div>
+                        </div>
+                    </div>
                 </div>
                 </div>
             </div>
@@ -126,7 +145,6 @@ function createTeamCaptersSummaryChart(team_id) {
             details : matchesData[match]['squads'].findIndex(item => item.team_id === team_id)+1 // classification for that match
         }
         donutData.push(match_collection);
-        console.log(teams_classification[selected_team]["details"][matchesData[match]["chapter"]])
     }
     // console.log("Donut data:", donutData); // Log donut chart data
 
@@ -181,4 +199,135 @@ function createTeamCaptersSummaryChart(team_id) {
     // Draw the donut chart
     donutChart.container('donut-container');
     donutChart.draw();
+}
+
+function createTeamsClassificationSummary(team_id){
+
+    for (let team in teams_classification) //returns the index
+    {
+        if(team_id === teams_classification[team]['id']) {
+            selected_team = team;
+            break;
+        }
+    }
+    let from_first_perc = teams_classification[selected_team]['value'] / teams_classification[0]['value'];
+    let from_prev_perc = from_first_perc;
+    if (selected_team > 0) {
+        from_prev_perc = teams_classification[selected_team]['value'] / teams_classification[selected_team-1]['value'];
+    }
+    let from_last_perc = teams_classification[teams_classification.length-1]['value'] / teams_classification[selected_team]['value'];
+    let from_next_perc = from_last_perc;
+    if (selected_team < teams_classification.length-1) {
+        from_next_perc = teams_classification[parseInt(selected_team)+1]['value'] / teams_classification[selected_team]['value'];
+    }
+
+    var from_first_bar = new ProgressBar.SemiCircle('#progress-from-first-container', {
+    strokeWidth: 6,
+    color: '#5f5f5fff',
+    trailColor: '#eee',
+    trailWidth: 1,
+    easing: 'easeInOut',
+    duration: 1400,
+    svgStyle: null,
+    text: {
+        value: '',
+    },
+    // Set default step function for all animate calls
+    step: (state, bar) => {
+        var value = ((bar.value()-1) * teams_classification[0]['value']).toFixed(1);
+
+        if (value == 0.0) {
+            bar.setText("🏆");
+        } else {
+            bar.setText(value);
+        }
+    }
+    });
+    from_first_bar.text.style.fontFamily = '"Raleway", Helvetica, sans-serif';
+    from_first_bar.text.style.fontSize = '1.5rem';
+
+    var from_prev_bar = new ProgressBar.SemiCircle('#progress-from-prev-container', {
+    strokeWidth: 6,
+    color: '#5f5f5fff',
+    trailColor: '#eee',
+    trailWidth: 1,
+    easing: 'easeInOut',
+    duration: 1400,
+    svgStyle: null,
+    text: {
+        value: '',
+    },
+    step: (state, bar) => { // Set default step function for all animate calls
+        var value;
+        if (selected_team > 0) {
+            value = ((bar.value()-1) * teams_classification[selected_team-1]['value']).toFixed(1);
+        }
+        else {
+            var value = ((bar.value()-1) * teams_classification[0]['value']).toFixed(1);
+        }
+
+        if (value == 0.0) {
+            bar.setText("🏆");
+        } else {
+            bar.setText(value);
+        }
+    }
+    });
+    from_prev_bar.text.style.fontFamily = '"Raleway", Helvetica, sans-serif';
+    from_prev_bar.text.style.fontSize = '1.5rem';
+
+    var from_next_bar = new ProgressBar.SemiCircle('#progress-from-next-container', {
+    strokeWidth: 6,
+    color: '#5f5f5fff',
+    trailColor: '#eee',
+    trailWidth: 1,
+    easing: 'easeInOut',
+    duration: 1400,
+    svgStyle: null,
+    text: {
+        value: '',
+    },
+    step: (state, bar) => { // Set default step function for all animate calls
+        
+        var value = ((1-bar.value()) * teams_classification[selected_team]['value']).toFixed(1);
+
+        if (value == 0.0) {
+            bar.setText("⚰️");
+        } else {
+            bar.setText(value);
+        }
+    }
+    });
+    from_next_bar.text.style.fontFamily = '"Raleway", Helvetica, sans-serif';
+    from_next_bar.text.style.fontSize = '1.5rem';
+
+    var from_last_bar = new ProgressBar.SemiCircle('#progress-from-last-container', {
+    strokeWidth: 6,
+    color: '#5f5f5fff',
+    trailColor: '#eee',
+    trailWidth: 1,
+    easing: 'easeInOut',
+    duration: 1400,
+    svgStyle: null,
+    text: {
+        value: '',
+    },
+    step: (state, bar) => { // Set default step function for all animate calls
+        
+        var value = ((1-bar.value()) * teams_classification[selected_team]['value']).toFixed(1);
+
+        if (value == 0.0) {
+            bar.setText("⚰️");
+        } else {
+            bar.setText(value);
+        }
+    }
+    });
+    from_last_bar.text.style.fontFamily = '"Raleway", Helvetica, sans-serif';
+    from_last_bar.text.style.fontSize = '1.5rem';
+
+    from_first_bar.animate(from_first_perc);  // Number from 0.0 to 1.0
+    from_prev_bar.animate(from_prev_perc);  // Number from 0.0 to 1.0
+    from_next_bar.animate(from_next_perc);  // Number from 0.0 to 1.0
+    from_last_bar.animate(from_last_perc);  // Number from 0.0 to 1.0
 }

@@ -21,9 +21,10 @@
     <script src="https://afezza.github.io/fantaOPbot/webApp/botWebApp/scoresInfo.js"></script>
     <script src="https://afezza.github.io/fantaOPbot/webApp/botWebApp/squadsInfo.js"></script>
     <script src="https://afezza.github.io/fantaOPbot/webApp/botWebApp/teamsInfo.js"></script> 
+    <script src="https://afezza.github.io/fantaOPbot/webApp/botWebApp/utils/progressbar.min.js"></script>
 
     <script src="https://cdn.anychart.com/releases/8.10.0/js/anychart-bundle.min.js"></script>
-    
+
     <script>
         const scoresData = //SCORES_LIST;
         let matchesData = //MATCHES_LIST;
@@ -45,6 +46,7 @@
                 if (selectedPage === key) {
                     showView(loadTeamsInfo(key));
                     createTeamCaptersSummaryChart(key);
+                    createTeamsClassificationSummary(key);
                     return;
                 }
             }
