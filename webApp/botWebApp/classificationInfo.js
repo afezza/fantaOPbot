@@ -90,6 +90,7 @@ function createClassificationChart(){
 
     // Create an ordered array with the team classification
     let data = []
+    teams_classification = []
     for (let team in team_name_collection)
     {
         data.push(team_name_collection[team]);
