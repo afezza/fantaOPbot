@@ -28,9 +28,6 @@ function loadTeamsInfo(team_id) {
             </div>
             <div class="page-element col-sm-6">
                 <div class="card shadow">
-                <div class="card-header">
-                    <h5>Punteggi capitoli</h5>
-                </div>
                 <div class="card-body" id="donut-container" style="height: 450px; width: 100%;"></div>
                 </div>
             </div>
@@ -160,7 +157,7 @@ function createTeamCaptersSummaryChart(team_id) {
 
     // Create and configure a custom label
     var label = anychart.standalones.label();
-    label.text(`${parseInt(selected_team)+1}\u00B0\nclassificato`);
+    label.text(`${parseInt(selected_team)+1}\u00B0\nclassificato\n\n${teams_classification[selected_team]["value"]} punti`);
     label.fontColor("#60727b");
     label.fontSize(24);
     label.width("100%");
