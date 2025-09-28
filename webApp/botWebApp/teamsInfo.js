@@ -28,23 +28,10 @@ function loadTeamsInfo(team_id) {
             </div>
             <div class="page-element col-sm-6">
                 <div class="card shadow">
-
-                    <div class="card-header row">
-                        <h5 class="col-9">Posizione in classifica</h5>
-                        <h5 class="col-3 text-center">${teams_classification.findIndex(item => item.id === team_id)+1}</h5>
-                    </div>
-                    <ul class="list-group list-group"  style="height: 250px; max-height: 250px; overflow-y: scroll">`
-                    for (let match in matchesData){
-                        
-                        if(matchesData[match]['state'] != "COMPLETED") {continue;}
-
-                        pageContent += `<li class="list-group-item">
-                        <div class="row">
-                        <div class="col text-center">${matchesData[match]["chapter"]}</div>
-                        <div class="col text-center">${matchesData[match]['squads'].findIndex(item => item.team_id === team_id)+1}</div>
-                        </div></li>`
-                    }
-                    pageContent += `</ul>
+                <div class="card-header">
+                    <h5>Punteggi capitoli</h5>
+                </div>
+                <div class="card-body" id="donut-container" style="height: 450px; width: 100%;"></div>
                 </div>
             </div>
             <div class="page-element col-sm-6">
@@ -52,14 +39,6 @@ function loadTeamsInfo(team_id) {
                 <div class="card-body">
                     <p class="h5 text-center">Distanze tra prima e ultima</p>
                 </div>
-                </div>
-            </div>
-            <div class="page-element col-sm-6">
-                <div class="card shadow">
-                <div class="card-header">
-                    <h5>Punteggi capitoli</h5>
-                </div>
-                <div class="card-body" id="donut-container" style="height: 450px; width: 100%;"></div>
                 </div>
             </div>
             <div class="page-element col-sm-6">
@@ -76,8 +55,29 @@ function loadTeamsInfo(team_id) {
                         </div></li>`;
                     } 
                 pageContent += `</ul></div>
-            </div>
-        </div>`
+            </div>`
+            if(teamsData[selected_team]['swap'] !== "None")
+            {
+                pageContent += `<div class="page-element col-sm-6">
+                    <div class="card shadow">
+                        <div class="card-body">
+                            <h4 class="col text-center">Scambi effettuati</h4>
+                        </div>
+                        <ul class="list-group list-group"  style="height: 250px; max-height: 250px; overflow-y: scroll">`
+                        for (let player in teamsData[selected_team]['swap']){
+                            pageContent += `<li class="list-group-item">
+                            <div class="row">
+                            <div class="col-5 text-center">${teamsData[selected_team]['swap'][player]['sell']}</div>
+                            <div class="col-1" style="padding-left: 5px;"><span class="badge bg-info text-dark">${teamsData[selected_team]['swap'][player]['old_price']}</span></div>
+                            <div class="col-2"><img src="https://i.ibb.co/v4bt3jJz/swap.png" style="height: 40px" alt="swap" border="0"> </div>
+                            <div class="col-4 text-center">${teamsData[selected_team]['swap'][player]['buy']}</div>
+                            </div></li>`;
+                        } 
+                        pageContent += `</ul>
+                    </div>
+                </div>`
+            }
+        pageContent += `</div>`
     
     let containerObj = document.createElement('div')
     containerObj.classList.add('container');
@@ -114,8 +114,21 @@ function createTeamCaptersSummaryChart(team_id) {
         }
     }
 
-    const donutData = Object.entries(teams_classification[selected_team].details).map(([key, value]) => ({ x: key, value }));
-    console.log("Donut chart data:", donutData); // Log donut chart data
+    let donutData = [];
+    for (let match in matchesData){
+
+        if(matchesData[match]['state'] != "COMPLETED") {continue;}
+
+        match_collection =
+        {
+            x: matchesData[match]["chapter"],
+            value : teams_classification[selected_team]["details"][matchesData[match]["chapter"]], // scored points 
+            details : matchesData[match]['squads'].findIndex(item => item.team_id === team_id)+1 // classification for that match
+        }
+        donutData.push(match_collection);
+        console.log(teams_classification[selected_team]["details"][matchesData[match]["chapter"]])
+    }
+    // console.log("Donut data:", donutData); // Log donut chart data
 
     // Set data and title for the donut chart
     donutChart.data(donutData);
@@ -124,27 +137,21 @@ function createTeamCaptersSummaryChart(team_id) {
 
     // Set the position of labels and format them
     donutChart.labels().format('{%value}{decimalsCount:1,zeroFillDecimals:true}');
-    donutChart.labels().position("outside");
+    donutChart.labels().position("inside");
     donutChart.connectorStroke({color: "#595959", thickness: 2, dash:"2 2"});
 
-    // // Create and configure a custom label
-    // var label = anychart.standalones.label();
-    // let maxVal = 0;
-    // let minVal = 1000;
-    // donutData.forEach((value,key) => {
-    //     if(Number(value.value) > Number(maxVal)){maxVal = value.value;}
-    //     if(Number(value.value) < Number(minVal)){minVal = value.value;}
-    // });
-    // label.text("Max: " + maxVal + "\nMin: " + minVal);
-    // label.fontColor("#60727b");
-    // label.fontSize(15);
-    // label.width("100%");
-    // label.height("100%");
-    // label.hAlign("center");
-    // label.vAlign("middle");
+    // Create and configure a custom label
+    var label = anychart.standalones.label();
+    label.text(`${parseInt(selected_team)+1}\u00B0\nclassificato`);
+    label.fontColor("#60727b");
+    label.fontSize(24);
+    label.width("100%");
+    label.height("100%");
+    label.hAlign("center");
+    label.vAlign("middle");
 
-    // // Set the label as the center content
-    // donutChart.center().content(label);
+    // Set the label as the center content
+    donutChart.center().content(label);
 
     // Shows the chapters with 0 total points in the legend
     var legend = donutChart.legend();
@@ -157,8 +164,18 @@ function createTeamCaptersSummaryChart(team_id) {
                 legendItems.push({text: value.x, iconFill: colors[Math.ceil(3*Math.random())] ,iconType: "circle"});
             }
         });
-        console.log(legendItems);
+        // console.log(legendItems);
+        if (legendItems.length > 0) legendItems.unshift({text: "Capitoli con 0 punti: ", iconFill: "white", iconType: "circle"})
         return legendItems;        
+    });
+
+    // Set tooltip to show chapters specification
+    var tooltip = donutChart.tooltip();
+    tooltip.titleFormat("{%x}");
+    tooltip.format((e) => {
+        toolTipText = `Totalizzato ${donutData[e.index].value} punti
+        Classificato ${donutData[e.index].details}\u00B0 posto`; 
+        return toolTipText
     });
 
     // Draw the donut chart
