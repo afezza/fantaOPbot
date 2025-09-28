@@ -59,19 +59,19 @@ function chapterSquadsSelection(value){
                         <div class="col-10">${matchesData[match]['squads'][team]['players'][player]['name']}</div>
                         <div class="col-2"> `
                         if(matchesData[match]['squads'][team]['players'][player]['role'] === "Capitano"){
-                            pageElem += `<img src="https://i.ibb.co/w2JvZMW/captain-Icon.png" style="height: 20px" alt="Straw hat">`
+                            pageElem += `<img src="https://i.ibb.co/w2JvZMW/captain-Icon.png" style="height: 20px" alt="Straw hat" data-bs-toggle="tooltip" data-bs-placement="top" title="Capitano">`
                         } 
                         else if(matchesData[match]['squads'][team]['players'][player]['role'] === "Vice"){
-                            pageElem += `<img src="https://i.ibb.co/PfP2zjs/viceIcon.png" style="height: 25px" alt="Gun">`
+                            pageElem += `<img src="https://i.ibb.co/PfP2zjs/viceIcon.png" style="height: 25px" alt="Gun" data-bs-toggle="tooltip" data-bs-placement="top" title="Vice">`
                         }
                         else if(matchesData[match]['squads'][team]['players'][player]['role'] === "1° riserva"){
-                            pageElem += `<span class="badge bg-warning text-dark">R1</span>`
+                            pageElem += `<span class="badge bg-warning text-dark" data-bs-toggle="tooltip" data-bs-placement="top" title="1° riserva">R1</span>`
                         }
                         else if(matchesData[match]['squads'][team]['players'][player]['role'] === "2° riserva"){
-                            pageElem += `<span class="badge bg-warning text-dark">R2</span>`
+                            pageElem += `<span class="badge bg-warning text-dark" data-bs-toggle="tooltip" data-bs-placement="top" title="2° riserva">R2</span>`
                         }
                         else if(matchesData[match]['squads'][team]['players'][player]['role'] === "3° riserva"){
-                            pageElem += `<span class="badge bg-warning text-dark">R3</span>`
+                            pageElem += `<span class="badge bg-warning text-dark" data-bs-toggle="tooltip" data-bs-placement="top" title="3° riserva">R3</span>`
                         }
                         pageElem += `</div></div></li>`;
                     } 
