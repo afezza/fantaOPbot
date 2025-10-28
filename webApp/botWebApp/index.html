@@ -18,7 +18,6 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
     
     <script src="https://afezza.github.io/fantaOPbot/webApp/botWebApp/classificationInfo.js"></script>
-    <script src="https://afezza.github.io/fantaOPbot/webApp/botWebApp/scoresInfo.js"></script>
     <script src="https://afezza.github.io/fantaOPbot/webApp/botWebApp/squadsInfo.js"></script>
     <script src="https://afezza.github.io/fantaOPbot/webApp/botWebApp/teamsInfo.js"></script> 
     <script src="https://afezza.github.io/fantaOPbot/webApp/botWebApp/utils/progressbar.min.js"></script>
@@ -62,11 +61,7 @@
             } 
             else if (selectedPage === 'Formazioni') {
                 showView(loadSquadsInfo());
-                chapterSquadsSelection(document.getElementById('squad-chapter-selection').value);
-            } 
-            else if (selectedPage === 'Punteggi') {
-                showView(loadScoresInfo());
-                chapterScoresSelection(document.getElementById('score-chapter-selection').value);
+                chapterSquadsScoreSelect(false, document.getElementById('squad-chapter-selection').value)
             } 
             else if (selectedPage === 'Davy Back fight') {
                 // selectedView = loadChaptersInfo(pageViews);
@@ -104,7 +99,6 @@
                     </li>
                     <li class="nav-item"> <a class="nav-link" href="#" data-bs-toggle="collapse" data-bs-target=".navbar-collapse.show" onclick="loadPage('Personaggi')"><span>Personaggi</span></a></li>
                     <li class="nav-item"> <a class="nav-link" href="#" data-bs-toggle="collapse" data-bs-target=".navbar-collapse.show" onclick="loadPage('Formazioni')"><span>Formazioni</span></a></li>
-                    <li class="nav-item"> <a class="nav-link" href="#" data-bs-toggle="collapse" data-bs-target=".navbar-collapse.show" onclick="loadPage('Punteggi')"><span>Punteggi</span></a></li>
                     <li class="nav-item"> <a class="nav-link" href="#" data-bs-toggle="collapse" data-bs-target=".navbar-collapse.show" onclick="loadPage('Davy Back fight')"><span>Davy Back fight</span></a></li>
                 </ul>
                 </div>
