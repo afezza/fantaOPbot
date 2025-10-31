@@ -11,7 +11,8 @@
 
     <title>FantaOP web interface</title>
   </head>
-  <body>
+  <body style="background-image: url('https://i.ibb.co/7JgjcWr9/IMG-8466.png'); background-repeat: no-repeat; background-attachment: fixed; background-size: cover;">
+    
     <link rel="stylesheet" href="https://afezza.github.io/fantaOPbot/webApp/botWebApp/style.css">
 
     <!-- Option 1: Bootstrap Bundle with Popper -->
@@ -20,9 +21,11 @@
     <script src="https://afezza.github.io/fantaOPbot/webApp/botWebApp/classificationInfo.js"></script>
     <script src="https://afezza.github.io/fantaOPbot/webApp/botWebApp/squadsInfo.js"></script>
     <script src="https://afezza.github.io/fantaOPbot/webApp/botWebApp/teamsInfo.js"></script> 
+    <script src="https://afezza.github.io/fantaOPbot/webApp/botWebApp/playersInfo.js"></script> 
     <script src="https://afezza.github.io/fantaOPbot/webApp/botWebApp/utils/progressbar.min.js"></script>
 
     <script src="https://cdn.anychart.com/releases/8.10.0/js/anychart-bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jstat@latest/dist/jstat.min.js"></script>
 
     <script>
         const scoresData = //SCORES_LIST;
@@ -57,7 +60,7 @@
                 createClassificationChart();
             } 
             else if (selectedPage === 'Personaggi') {
-                // selectedView = loadPlayersInfo(pageViews);
+                showView(loadPlayersInfo());
             } 
             else if (selectedPage === 'Formazioni') {
                 showView(loadSquadsInfo());
@@ -78,9 +81,12 @@
             for (let team in teamsData){
                 teams_names.set(teamsData[team]['team_id'],teamsData[team]['team_name'])
             }
-
             // Generate team names for the navbar
             generateNavbarTeamsDropdown();
+
+            // Generate the players statistics
+            generatePlayersStatistics();
+            
             // Load the main page
             loadPage('Classifica');
         });
@@ -104,6 +110,17 @@
                 </div>
             </div>
             </nav>
+
+            <!-- Offcanvas -->
+            <div class="offcanvas offcanvas-start" tabindex="-1" id="charStatOffcanvas" aria-labelledby="charStatOffcanvasLabel">
+                <div class="offcanvas-header">
+                    <h5 class="offcanvas-title" id="charStatOffcanvasLabel">Offcanvas</h5>
+                    <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+                </div>
+                <div class="offcanvas-body">
+                    Content for the offcanvas goes here. You can place just about any Bootstrap component or custom elements here.
+                </div>
+            </div>
 
             <div class="container-fluid" style="margin-top:56px; padding-bottom: 20px;" id="main-body">
                 <div class="container">Select a page</div>

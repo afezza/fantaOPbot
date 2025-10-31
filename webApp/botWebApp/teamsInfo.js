@@ -66,7 +66,8 @@ function loadTeamsInfo(team_id) {
                     for (let player in teamsData[selected_team]['players']){
                         pageContent += `<li class="list-group-item">
                         <div class="row">
-                        <div class="col-10">${teamsData[selected_team]['players'][player]['name']}</div>
+                        <div class="col-10" data-bs-toggle="offcanvas" href="#charStatOffcanvas" role="button" aria-controls="charStatOffcanvas" onclick="loadPlayerOffcanvas('${teamsData[selected_team]['players'][player]['name']}')">
+                        ${teamsData[selected_team]['players'][player]['name']}</div>
                         <div class="col-2"> ${teamsData[selected_team]['players'][player]['price']}</div>
                         </div></li>`;
                     } 
@@ -83,10 +84,12 @@ function loadTeamsInfo(team_id) {
                         for (let player in teamsData[selected_team]['swap']){
                             pageContent += `<li class="list-group-item">
                             <div class="row">
-                            <div class="col-5 text-center">${teamsData[selected_team]['swap'][player]['sell']}</div>
+                            <div class="col-5 text-center" data-bs-toggle="offcanvas" href="#charStatOffcanvas" role="button" aria-controls="charStatOffcanvas" onclick="loadPlayerOffcanvas('${teamsData[selected_team]['swap'][player]['sell']}')">
+                            ${teamsData[selected_team]['swap'][player]['sell']}</div>
                             <div class="col-1" style="padding-left: 5px;"><span class="badge bg-info text-dark">${teamsData[selected_team]['swap'][player]['old_price']}</span></div>
                             <div class="col-2"><img src="https://i.ibb.co/v4bt3jJz/swap.png" style="height: 40px" alt="swap" border="0"> </div>
-                            <div class="col-4 text-center">${teamsData[selected_team]['swap'][player]['buy']}</div>
+                            <div class="col-4 text-center" data-bs-toggle="offcanvas" href="#charStatOffcanvas" role="button" aria-controls="charStatOffcanvas" onclick="loadPlayerOffcanvas('${teamsData[selected_team]['swap'][player]['buy']}')">
+                            ${teamsData[selected_team]['swap'][player]['buy']}</div>
                             </div></li>`;
                         } 
                         pageContent += `</ul>

@@ -76,7 +76,8 @@ function chapterSquadsSelection(value){
                     for (let player in matchesData[match]['squads'][team]['players']){
                         pageElem += `<li class="list-group-item">
                         <div class="row">
-                        <div class="col-10">${matchesData[match]['squads'][team]['players'][player]['name']}</div>
+                        <div class="col-10" data-bs-toggle="offcanvas" href="#charStatOffcanvas" role="button" aria-controls="charStatOffcanvas" onclick="loadPlayerOffcanvas('${matchesData[match]['squads'][team]['players'][player]['name']}')"> 
+                        ${matchesData[match]['squads'][team]['players'][player]['name']}</div>
                         <div class="col-2"> `
                         if(matchesData[match]['squads'][team]['players'][player]['role'] === "Capitano"){
                             pageElem += `<img src="https://i.ibb.co/w2JvZMW/captain-Icon.png" style="height: 20px" alt="Straw hat" data-bs-toggle="tooltip" data-bs-placement="top" title="Capitano">`
@@ -133,7 +134,8 @@ function chapterScoresSelection(value){
                         }
                         pageElem += `<li class="list-group-item">
                         <div class="row">
-                        <div class="col-5">${matchesData[match]['squads'][team]['players'][player]['name']} `
+                        <div class="col-5" data-bs-toggle="offcanvas" href="#charStatOffcanvas" role="button" aria-controls="charStatOffcanvas" onclick="loadPlayerOffcanvas('${matchesData[match]['squads'][team]['players'][player]['name']}')">
+                        ${matchesData[match]['squads'][team]['players'][player]['name']} `
                         if(matchesData[match]['squads'][team]['players'][player]['role'] === "Capitano"){
                             pageElem += `<span class="badge bg-primary">x2</span>`
                         } 
