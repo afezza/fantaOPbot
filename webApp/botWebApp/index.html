@@ -61,6 +61,7 @@
             } 
             else if (selectedPage === 'Personaggi') {
                 showView(loadPlayersInfo());
+                orderPlayerBySelection(document.getElementById('player-scores-selection').value)
             } 
             else if (selectedPage === 'Formazioni') {
                 showView(loadSquadsInfo());

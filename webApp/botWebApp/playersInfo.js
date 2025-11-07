@@ -9,34 +9,82 @@ function loadPlayersInfo() {
             <div class="card shadow">
             <div class="card-body">
                 <div class="row">
-                    <h4 class="card-title col">Seleziona il capitolo</h4>
-                    <div class="form-check form-switch col">
-                        <div class="row justify-content-center"><label class="form-check-label col text-center " for="flexSwitchCheckScores">Mostra punteggi</label></div>
-                        <div class="row justify-content-center" style="padding-left: 40px;"><input class="form-check-input" type="checkbox" id="flexSwitchCheckScores" onchange="chapterSquadsScoreSelect(this.checked,chapterSelected)"></div>
-                    </div>`
-                    let selectHtlm = `<select class="form-select col" aria-label="Chapter selection" id="squad-chapter-selection" onchange="chapterSquadsScoreSelect(isScoresRequired,this.value)">`
-                    for (let match = matchesData.length-1; match >= 0; match--)
-                    {
-                        if(matchesData[match]['state'] === "None") {continue;}
-                    
-                        selectHtlm += `<option value="${matchesData[match]['chapter']}">${matchesData[match]['chapter']}</option>`
-    
-                    }
+                    <h4 class="card-title col">Ordina giocatori per:</h4>`
+                    let selectHtlm = `<select style="white-space: wrap" class="form-select col" aria-label="Scores selection" id="player-scores-selection" onchange="orderPlayerBySelection(this.value)">`
+                    players_statistics.values().next().value.forEach((value, key)=>{
+                        if (key === 'chaper_value_score') {
+                            selectHtlm += `<option value="${key}">Punti totali</option>
+                            <option value="${key}-last3">Punti totali (ultimi 3 capitoli)</option>`
+                        }
+                        else if (key === 'chaper_value_score_raw') {
+                            selectHtlm += `<option value="${key}">Punti totali (senza Capitano e Vice)</option>`
+                        }
+                        else if (key === 'chaper_value_score_pos') {
+                            selectHtlm += `<option value="${key}">Punti totali positivi</option>`
+                        }
+                        else if (key === 'chaper_value_score_neg') {
+                            selectHtlm += `<option value="${key}">Punti totali negativi</option>`
+                        }
+                        else{
+                            selectHtlm += `<option value="${key}">${scoresData[key]['description']}</option>`
+                        }
+                    });
                     selectHtlm += `</select>`
                     
-                    pageContent += selectHtlm +`
+    pageContent += selectHtlm +`
                 </div>
             </div>
             </div>
         </div>
     </div>
-    <div class="row" id="squads-summary"></div>`
+    <div class="row" id="players-ordered"></div>`
     
     let containerObj = document.createElement('div')
     containerObj.classList.add('container');
     containerObj.innerHTML = pageContent.trim();
 
     return containerObj
+}
+
+function orderPlayerBySelection(selected_score)
+{
+    playersOrdered = document.getElementById("players-ordered");
+    playersOrdered.innerHTML = ''
+    
+    let pageElemObj = document.createElement('div')
+    pageElemObj.classList.add('page-element');
+    pageElemObj.classList.add('col-sm-12');
+    
+    let ordered_players_list = []; 
+    if (selected_score == "chaper_value_score-last3") {
+        players_statistics.forEach((value, key)=>{
+            let jstat = this.jStat(value.get("chaper_value_score").slice(-3));
+            ordered_players_list.push({name: key, value: jstat.sum()});
+        });
+    }
+    else
+    {
+        players_statistics.forEach((value, key)=>{
+            let jstat = this.jStat(value.get(selected_score));
+            ordered_players_list.push({name: key, value: jstat.sum()});
+        });
+    }
+    ordered_players_list.sort((a, b) => b.value - a.value);
+
+    pageElem =`<div class="card shadow">
+            <ul class="list-group list-group">`
+                ordered_players_list.forEach((value)=>{
+                    pageElem += `<li class="list-group-item">
+                    <div class="row">
+                    <div class="col-9" data-bs-toggle="offcanvas" href="#charStatOffcanvas" role="button" aria-controls="charStatOffcanvas" onclick="loadPlayerOffcanvas('${value.name}')">
+                    ${value.name}</div>
+                    <div class="col-3"> ${value.value}</div></div></li>`;
+                });
+            pageElem += `</ul></div>
+        </div>`
+    pageElemObj.innerHTML = pageElem.trim();
+    playersOrdered.appendChild(pageElemObj);
+    return;
 }
 
 function generatePlayersStatistics()
