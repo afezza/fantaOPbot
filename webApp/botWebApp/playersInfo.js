@@ -1,11 +1,30 @@
 var players_statistics;
+var max_stdev;
+var min_stdev;
+var max_stdev_raw;
+var min_stdev_raw;
 
 function loadPlayersInfo() {
+
+    max_stdev = 0;
+    min_stdev = 0;
+    max_stdev_raw = 0;
+    min_stdev_raw = 0;
 
     scores_list = [];
     players_statistics.forEach((value, key)=>{
         value.forEach((value, key)=>{
             let jstat = this.jStat(value);
+            if (key === 'chaper_value_score') {
+                if (jstat.stdev() > max_stdev) {
+                    max_stdev = jstat.stdev();
+                }
+            }
+            else if (key === 'chaper_value_score_raw') {
+                if (jstat.stdev() > max_stdev_raw) {
+                    max_stdev_raw = jstat.stdev();
+                } 
+            }
             if ((jstat.sum() !== 0) && (scores_list.some(name => name === key) === false))
             {
                 scores_list.push(key);
@@ -223,15 +242,8 @@ function loadPlayerOffcanvas(player)
                 <div class="row">
                     <div class="col-10">Punti totali </div>
                     <div class="col-2" data-bs-html="true" data-bs-toggle="tooltip" data-bs-placement="top" 
-                    title="Media ${jstat.mean().toFixed(2)}<br>Varianza ${jstat.stdev().toFixed(2)}">${jstat.sum()}</div>
-                </div>
-            </li>`
-            jstat = this.jStat(value.slice(-3));
-            offcanvasContent += `<li class="list-group-item">
-                <div class="row">
-                    <div class="col-10">Punti totali (ultimi 3 capitoli)</div>
-                    <div class="col-2" data-bs-html="true" data-bs-toggle="tooltip" data-bs-placement="top" 
-                    title="Media ${jstat.mean().toFixed(2)}<br>Varianza ${jstat.stdev().toFixed(2)}">${jstat.sum()}</div>
+                    title="Media ${jstat.mean().toFixed(2)}<br>Costanza 
+                    ${(1 + ((max_stdev - jstat.stdev()) * (5 - 1)) / (max_stdev - min_stdev)).toFixed(2)}/5">${jstat.sum()}</div>
                 </div>
             </li>`
         } 
@@ -241,7 +253,18 @@ function loadPlayerOffcanvas(player)
                 <div class="row">
                     <div class="col-10">Punti totali (senza Capitano e Vice)</div>
                     <div class="col-2" data-bs-html="true" data-bs-toggle="tooltip" data-bs-placement="top" 
-                    title="Media ${jstat.mean().toFixed(2)}<br>Varianza ${jstat.stdev().toFixed(2)}">${player_score_raw}</div>
+                    title="Media ${jstat.mean().toFixed(2)}<br>Costanza 
+                    ${(1 + ((max_stdev - jstat.stdev()) * (5 - 1)) / (max_stdev - min_stdev)).toFixed(2)}/5">${player_score_raw}</div>
+                </div>
+            </li>`
+            jstat = this.jStat(value.slice(-3));
+            jstat_prev = this.jStat(value.slice(value.length-4,value.length-1));
+            offcanvasContent += `<li class="list-group-item">
+                <div class="row">
+                    <div class="col-10">Punti totali (ultimi 3 capitoli)</div>
+                    <div class="col-2" data-bs-html="true" data-bs-toggle="tooltip" data-bs-placement="top" 
+                    title="Media ${jstat.mean().toFixed(2)}<br>Crescita 
+                    ${(jstat.mean() - jstat_prev.mean()).toFixed(2)}">${jstat.sum()}</div>
                 </div>
             </li>`
         } 
