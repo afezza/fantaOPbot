@@ -2,6 +2,17 @@ var players_statistics;
 
 function loadPlayersInfo() {
 
+    scores_list = [];
+    players_statistics.forEach((value, key)=>{
+        value.forEach((value, key)=>{
+            let jstat = this.jStat(value);
+            if ((jstat.sum() !== 0) && (scores_list.some(name => name === key) === false))
+            {
+                scores_list.push(key);
+            }
+        });
+    });
+
     // Generate the content 
     pageContent = 
     `<div class="row">
@@ -11,7 +22,7 @@ function loadPlayersInfo() {
                 <div class="row">
                     <h4 class="card-title col">Ordina giocatori per:</h4>`
                     let selectHtlm = `<select style="white-space: wrap" class="form-select col" aria-label="Scores selection" id="player-scores-selection" onchange="orderPlayerBySelection(this.value)">`
-                    players_statistics.values().next().value.forEach((value, key)=>{
+                    scores_list.forEach((key)=>{
                         if (key === 'chaper_value_score') {
                             selectHtlm += `<option value="${key}">Punti totali</option>
                             <option value="${key}-last3">Punti totali (ultimi 3 capitoli)</option>`
@@ -74,6 +85,9 @@ function orderPlayerBySelection(selected_score)
     pageElem =`<div class="card shadow">
             <ul class="list-group list-group">`
                 ordered_players_list.forEach((value)=>{
+                    if (value.value === 0) {
+                        return;
+                    }
                     pageElem += `<li class="list-group-item">
                     <div class="row">
                     <div class="col-9" data-bs-toggle="offcanvas" href="#charStatOffcanvas" role="button" aria-controls="charStatOffcanvas" onclick="loadPlayerOffcanvas('${value.name}')">
