@@ -136,25 +136,34 @@ function chapterScoresSelection(value){
                         <div class="row">
                         <div class="col-5" data-bs-toggle="offcanvas" href="#charStatOffcanvas" role="button" aria-controls="charStatOffcanvas" onclick="loadPlayerOffcanvas('${matchesData[match]['squads'][team]['players'][player]['name']}')">
                         ${matchesData[match]['squads'][team]['players'][player]['name']} `
-                        if(matchesData[match]['squads'][team]['players'][player]['role'] === "Capitano"){
-                            pageElem += `<span class="badge bg-primary">x2</span>`
-                        } 
-                        else if(matchesData[match]['squads'][team]['players'][player]['role'] === "Vice"){
-                            pageElem += `<span class="badge bg-info text-dark">x1.5</span>`
-                        }
-                        pageElem += `</div><div class="col-7">`
+
+                        // Create the score part to calculate the total score of the player
+                        total_player_score = 0;
+                        scoreElem = `<div class="col-7">`
                         Object.keys(matchesData[match]['squads'][team]['players'][player]['score']).forEach(key => {
                             if(matchesData[match]['squads'][team]['players'][player]['score'][key] > 0){
-                                pageElem += `<span class="badge bg-success me-2" data-bs-toggle="tooltip" data-bs-placement="top" title="${scoresData[key]['description']}">
+                                scoreElem += `<span class="badge bg-success me-2" data-bs-toggle="tooltip" data-bs-placement="top" title="${scoresData[key]['description']}">
                                 ${key} ${matchesData[match]['squads'][team]['players'][player]['score'][key]}</span>`
                             }
                             else {
-                                pageElem += `<span class="badge bg-danger me-2" data-bs-toggle="tooltip" data-bs-placement="top" title="${scoresData[key]['description']}">
+                                scoreElem += `<span class="badge bg-danger me-2" data-bs-toggle="tooltip" data-bs-placement="top" title="${scoresData[key]['description']}">
                                 ${key} ${matchesData[match]['squads'][team]['players'][player]['score'][key]}</span>`
                             }
-                            });
-                        
-                        pageElem += `</div></div></li>`;
+                            total_player_score += parseFloat(matchesData[match]['squads'][team]['players'][player]['score'][key]);
+                        });
+                        scoreElem += `</div>`;
+
+                        if(matchesData[match]['squads'][team]['players'][player]['role'] === "Capitano"){
+                            pageElem += `<span class="badge bg-primary">x2</span> <span class="badge bg-secondary">${total_player_score*2}</span>`
+                        } 
+                        else if(matchesData[match]['squads'][team]['players'][player]['role'] === "Vice"){
+                            pageElem += `<span class="badge bg-info text-dark">x1.5</span> <span class="badge bg-secondary">${total_player_score*1.5}</span>`
+                        }
+                        else
+                        {
+                            pageElem += `<span class="badge bg-secondary">${total_player_score}</span>`
+                        }
+                        pageElem += `</div>` + scoreElem + `</li>`;
                     } 
                         
                     pageElem += `</ul></div>`
