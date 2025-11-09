@@ -134,7 +134,7 @@ function createClassificationChart(){
     tooltip.titleFormat("{%x}: {%value}");
     tooltip.format((e) => {
         toolTipText = ""; 
-        Object.keys(data[e.index].details).forEach(key => {
+        Object.keys(data[e.index].details).reverse().forEach(key => {
             toolTipText += `${key}: ${data[e.index].details[key]}\n`;
             });
 
