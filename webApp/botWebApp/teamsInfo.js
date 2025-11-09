@@ -66,9 +66,9 @@ function loadTeamsInfo(team_id) {
                     for (let player in teamsData[selected_team]['players']){
                         pageContent += `<li class="list-group-item">
                         <div class="row">
-                        <div class="col-10" data-bs-toggle="offcanvas" href="#charStatOffcanvas" role="button" aria-controls="charStatOffcanvas" onclick="loadPlayerOffcanvas('${teamsData[selected_team]['players'][player]['name']}')">
+                        <div class="col-9" data-bs-toggle="offcanvas" href="#charStatOffcanvas" role="button" aria-controls="charStatOffcanvas" onclick="loadPlayerOffcanvas('${teamsData[selected_team]['players'][player]['name']}')">
                         ${teamsData[selected_team]['players'][player]['name']}</div>
-                        <div class="col-2"> ${teamsData[selected_team]['players'][player]['price']}</div>
+                        <div class="col-3"> ${teamsData[selected_team]['players'][player]['price']}</div>
                         </div></li>`;
                     } 
                 pageContent += `</ul></div>
