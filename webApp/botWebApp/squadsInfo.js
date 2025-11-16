@@ -176,3 +176,60 @@ function chapterScoresSelection(value){
     return new bootstrap.Tooltip(tooltipTriggerEl)
     })
 }
+
+function storeUserSquad() {
+            console.log(Telegram.WebApp)
+            
+            let user_squad;
+            // Build data to send to backend
+            let user_team_id = '';
+            for (let team in teamsData)
+            {
+                if (teamsData[team]["owner"] === ('@' + Telegram.WebApp.initDataUnsafe.user.username) ) {
+                    user_team_id = teamsData[team]["team_id"];
+                    break;
+                }
+            }
+
+            for (let match = matchesData.length-1; match >= 0; match--)
+            {
+                if(matchesData[match]['state'] !== "WAIT_RANKING") {continue;}
+            
+                for (let team in matchesData[match]['squads'])
+                {
+                    if (matchesData[match]['squads'][team]["team_id"]===user_team_id) {
+                        user_squad = matchesData[match]['squads'][team];
+                        break;
+                    }
+                }
+                break;  // Only need to find the first completed chapter
+            }
+            //TEST to verify if it changes This will be the built object to send
+            for (let player in user_squad["players"])
+            {
+                user_squad["players"][player]["role"] = "Titolare"
+            }
+
+            const dataToSend = {
+                initData: Telegram.WebApp.initData,
+                squadData: JSON.stringify(user_squad)
+            };
+
+            // Make the POST request using fetch
+            fetch('https://lhkbtday6kadh4pmzfnemlpqzq0plkki.lambda-url.eu-north-1.on.aws/web_interface', {
+                method: 'POST',
+                mode: 'same-origin',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(dataToSend),
+            })
+            .then(response => response.json()) // Assuming the response is JSON
+            .then(data => {
+                // window.alert(data);
+                console.log(data)
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+            });
+        }
