@@ -2,7 +2,7 @@ const scores = //SCORES_ARRAY;
 let matchesData = //CHAPTER_DATA;
 let teamsData = //TEAMS_DATA;
 
-const roles = ["Capitano", "Vice", "Titolare", "1° riserva", "2° riserva", "3° riserva"];
+const roles = ["None", "Capitano", "Vice", "Titolare", "1° riserva", "2° riserva", "3° riserva"];
 
 let teams_names = new Map();
 
@@ -21,7 +21,7 @@ function populateTabs() {
             teamsData.forEach(team => {
                 let actualTeamData = {"team_id":team.team_id, "total_score":0.0, "players":[]};
                 team.players.forEach(player => {
-                    actualTeamData.players.push({"name":player.name,"role":"Titolare","score":"None"});
+                    actualTeamData.players.push({"name":player.name,"role":"None","score":"None"});
                 });
                 chapter.squads.push(actualTeamData);
             });
@@ -219,6 +219,7 @@ document.getElementById('saveButton').addEventListener('click', function() {
     matchesData.forEach(chapter => {
         // Check if the chapter data exsist
         if(chapter.state === "None"){
+            chapter.squads = "None"
             return;
         }
         // For valid chapters change the scores empty objects to None
