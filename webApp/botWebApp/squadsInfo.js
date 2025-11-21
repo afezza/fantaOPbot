@@ -222,7 +222,8 @@ function chapterSquadsInsertSelection(match){
         .then(response => response.json()) // Assuming the response is JSON
         .then(data => {
             // window.alert(data);
-            matchesData = JSON.parse(data);
+            // matchesData = JSON.parse(data);
+            matchesData = data;
             console.log(data)
         })
         .catch((error) => {
