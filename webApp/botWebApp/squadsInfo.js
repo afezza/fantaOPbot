@@ -231,8 +231,11 @@ function chapterSquadsInsertSelection(match){
                 pageElemObj.classList.add('col-sm-6');
                 pageElem =`<div class="card shadow">
                         <div class="card-header row gx-0">
-                        <h4>${teams_names.get(matchesData[match]['squads'][team]['team_id'])}</h4>
-                        </div>
+                        <h4 class="col-9">${teams_names.get(matchesData[match]['squads'][team]['team_id'])}</h4>
+                        <div class="col-3">
+                            <button type="button" class="btn btn-lg btn-outline-primary"><i class="bi bi-arrow-clockwise"></i></button>
+                            <button type="button" class="btn btn-lg btn-outline-primary" onclick="storeUserSquad()"><i class="bi bi-floppy2-fill"></i></button>
+                        </div></div>
                         <ul class="list-group list-group">`
                         for (let player in matchesData[match]['squads'][team]['players']){
                             if (matchesData[match]['squads'][team]['players'][player]['role'] === "None") {
@@ -240,9 +243,9 @@ function chapterSquadsInsertSelection(match){
                             }
                             pageElem += `<li class="list-group-item">
                             <div class="row">
-                            <div class="col-7" data-bs-toggle="offcanvas" href="#charStatOffcanvas" role="button" aria-controls="charStatOffcanvas" onclick="loadPlayerOffcanvas('${matchesData[match]['squads'][team]['players'][player]['name']}')"> 
+                            <div class="col-6" data-bs-toggle="offcanvas" href="#charStatOffcanvas" role="button" aria-controls="charStatOffcanvas" onclick="loadPlayerOffcanvas('${matchesData[match]['squads'][team]['players'][player]['name']}')"> 
                             ${matchesData[match]['squads'][team]['players'][player]['name']}</div>
-                            <div class="col-5"> 
+                            <div class="col-6"> 
                             <select class="form-select col" aria-label="Player role selection" id="player-role-selection" onchange="playerRoleSelect(${match},${team},${player},this.value)">`
                             if (matchesData[match]['squads'][team]['players'][player]['role'] === "Capitano") {
                                 pageElem += `<option value="Capitano" selected>Capitano</option>`
@@ -324,14 +327,12 @@ function storeUserSquad() {
         }
         break;  // Only need to find the first completed chapter
     }
-    //TEST to verify if it changes This will be the built object to send
-    for (let player in user_squad["players"])
-    {
-        user_squad["players"][player]["role"] = "Titolare"
-    }
+
+    //Controlla che i ruoli siano corretti 
 
     const dataToSend = {
         initData: Telegram.WebApp.initData,
+        command: "store_squad_info",
         squadData: JSON.stringify(user_squad)
     };
 
