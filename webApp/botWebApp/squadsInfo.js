@@ -1,5 +1,6 @@
 var isScoresRequired = false;
 var chapterSelected = 0;
+let user_team_id = '';
 
 function loadSquadsInfo() {
 
@@ -194,7 +195,6 @@ function chapterSquadsInsertSelection(match){
     else 
     {
         // Find the team id using the owner username
-        let user_team_id = '';
         for (let team in teamsData)
         {
             // if (teamsData[team]["owner"] === ('@zii_fons') ) { //DELETE ME 
