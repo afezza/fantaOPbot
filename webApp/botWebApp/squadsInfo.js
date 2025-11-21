@@ -343,9 +343,19 @@ function storeUserSquad() {
         window.alert("Capitano selezionato troppe volte");
         return;
     }
+    if (user_squad['players'].filter(el => el['role'] === "Capitano").length < 1)
+    {
+        window.alert("Seleziona il Capitano");
+        return;
+    }
     if (user_squad['players'].filter(el => el['role'] === "Vice").length > 1)
     {
         window.alert("Vice selezionato troppe volte");
+        return;
+    }
+    if (user_squad['players'].filter(el => el['role'] === "Vice").length < 1)
+    {
+        window.alert("Seleziona il Vice");
         return;
     }
     if (user_squad['players'].filter(el => el['role'] === "1° riserva").length > 1)
@@ -353,14 +363,29 @@ function storeUserSquad() {
         window.alert("1° riserva selezionata troppe volte");
         return;
     }
+    if (user_squad['players'].filter(el => el['role'] === "1° riserva").length < 1)
+    {
+        window.alert("Seleziona la 1° riserva");
+        return;
+    }
     if (user_squad['players'].filter(el => el['role'] === "2° riserva").length > 1)
     {
         window.alert("2° riserva selezionata troppe volte");
         return;
     }
+    if (user_squad['players'].filter(el => el['role'] === "2° riserva").length < 1)
+    {
+        window.alert("Seleziona la 2° riserva");
+        return;
+    }
     if (user_squad['players'].filter(el => el['role'] === "3° riserva").length > 1)
     {
         window.alert("3° riserva selezionata troppe volte");
+        return;
+    }
+    if (user_squad['players'].filter(el => el['role'] === "3° riserva").length < 1)
+    {
+        window.alert("Seleziona la 3° riserva");
         return;
     }
 
