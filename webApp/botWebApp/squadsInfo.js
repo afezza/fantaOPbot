@@ -186,7 +186,6 @@ function chapterSquadsInsertSelection(match){
     squadSummary = document.getElementById("squads-summary");
     squadSummary.innerHTML = ''
     
-    console.log(Telegram.WebApp)
     // if (Telegram.WebApp.initData !== "") {                      //test DELETE ME 
     if (Telegram.WebApp.initData === "") {
         // Tell the user to open from telegram
@@ -232,9 +231,11 @@ function chapterSquadsInsertSelection(match){
                 pageElem =`<div class="card shadow">
                         <div class="card-header row gx-0">
                         <h4 class="col-9">${teams_names.get(matchesData[match]['squads'][team]['team_id'])}</h4>
-                        <div class="col-3">
-                            <button type="button" class="btn btn-lg btn-outline-primary"><i class="bi bi-arrow-clockwise"></i></button>
-                            <button type="button" class="btn btn-lg btn-outline-primary" onclick="storeUserSquad()"><i class="bi bi-floppy2-fill"></i></button>
+                        <div class="col-3">`
+                            if (match > 0) {
+                                pageElem += `<button type="button" class="btn btn-outline-primary btn-sm" onclick="loadLastChapSquad(${match},${team})"><i class="bi bi-arrow-clockwise"></i></button>`
+                            }
+                            pageElem += `<button type="button" class="btn btn-outline-primary btn-sm" onclick="storeUserSquad()"><i class="bi bi-floppy2-fill"></i></button>
                         </div></div>
                         <ul class="list-group list-group">`
                         for (let player in matchesData[match]['squads'][team]['players']){
@@ -300,14 +301,22 @@ function chapterSquadsInsertSelection(match){
         .catch((error) => {
             console.error('Error:', error);
         });
-
-        
     }
 }
 
 function playerRoleSelect(match, team, player, selectedRole){
     matchesData[match]['squads'][team]['players'][player]['role'] = selectedRole;
-    console.log(matchesData);
+}
+
+function loadLastChapSquad(match,team) {
+    let prevTeam;
+    for (prevTeam in matchesData[match-1]['squads']) {
+        if (matchesData[match]['squads'][team]['team_id'] === matchesData[match-1]['squads'][prevTeam]['team_id']){break;}
+    }
+    for (let player in matchesData[match]['squads'][team]['players']) {
+        matchesData[match]['squads'][team]['players'][player]['role'] = matchesData[match-1]['squads'][prevTeam]['players'][player]['role'];
+    }
+    chapterSquadsInsertSelection(match)
 }
 
 function storeUserSquad() {
@@ -328,7 +337,32 @@ function storeUserSquad() {
         break;  // Only need to find the first completed chapter
     }
 
-    //Controlla che i ruoli siano corretti 
+    // Check if the roles are in the correct amount
+    if (user_squad['players'].filter(el => el['role'] === "Capitano").length > 1)
+    {
+        window.alert("Capitano selezionato troppe volte");
+        return;
+    }
+    if (user_squad['players'].filter(el => el['role'] === "Vice").length > 1)
+    {
+        window.alert("Vice selezionato troppe volte");
+        return;
+    }
+    if (user_squad['players'].filter(el => el['role'] === "1° riserva").length > 1)
+    {
+        window.alert("1° riserva selezionata troppe volte");
+        return;
+    }
+    if (user_squad['players'].filter(el => el['role'] === "2° riserva").length > 1)
+    {
+        window.alert("2° riserva selezionata troppe volte");
+        return;
+    }
+    if (user_squad['players'].filter(el => el['role'] === "3° riserva").length > 1)
+    {
+        window.alert("3° riserva selezionata troppe volte");
+        return;
+    }
 
     const dataToSend = {
         initData: Telegram.WebApp.initData,
