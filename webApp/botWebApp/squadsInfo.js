@@ -44,57 +44,256 @@ function chapterSquadsScoreSelect(scoresReq,chapterReq){
     isScoresRequired = scoresReq;
     chapterSelected = chapterReq;
 
-    if (isScoresRequired) {
-        return chapterScoresSelection(chapterSelected);
-    }
-    else 
+    for (let match in matchesData)
     {
-        return chapterSquadsSelection(chapterSelected);
+        if(matchesData[match]['chapter'] != chapterReq) {continue;}
+
+        if (matchesData[match]['state'] === "WAIT_RANKING") {
+            return chapterSquadsInsertSelection(match);
+        }
+        else
+        {
+            if (isScoresRequired) {
+                return chapterScoresSelection(match);
+            }
+            else 
+            {
+                return chapterSquadsSelection(match);
+            }
+        }
     }
 }
 
-function chapterSquadsSelection(value){
+function chapterSquadsSelection(match){
 
     squadSummary = document.getElementById("squads-summary");
     squadSummary.innerHTML = ''
     
-    for (let match in matchesData)
+    for (let team in matchesData[match]['squads'])
+    {   
+        let pageElemObj = document.createElement('div')
+        pageElemObj.classList.add('page-element');
+        pageElemObj.classList.add('col-sm-6');
+        pageElem =`<div class="card shadow">
+                <div class="card-header row gx-0">
+                <h4 class="col-9">${teams_names.get(matchesData[match]['squads'][team]['team_id'])}</h4>
+                <h5 class="col-3 text-center">${matchesData[match]['squads'][team]['total_score']}</h5>
+                </div>
+                <ul class="list-group list-group">`
+                for (let player in matchesData[match]['squads'][team]['players']){
+                    pageElem += `<li class="list-group-item">
+                    <div class="row">
+                    <div class="col-10" data-bs-toggle="offcanvas" href="#charStatOffcanvas" role="button" aria-controls="charStatOffcanvas" onclick="loadPlayerOffcanvas('${matchesData[match]['squads'][team]['players'][player]['name']}')"> 
+                    ${matchesData[match]['squads'][team]['players'][player]['name']}</div>
+                    <div class="col-2"> `
+                    if(matchesData[match]['squads'][team]['players'][player]['role'] === "Capitano"){
+                        pageElem += `<img src="https://i.ibb.co/w2JvZMW/captain-Icon.png" style="height: 20px" alt="Straw hat" data-bs-toggle="tooltip" data-bs-placement="top" title="Capitano">`
+                    } 
+                    else if(matchesData[match]['squads'][team]['players'][player]['role'] === "Vice"){
+                        pageElem += `<img src="https://i.ibb.co/PfP2zjs/viceIcon.png" style="height: 25px" alt="Gun" data-bs-toggle="tooltip" data-bs-placement="top" title="Vice">`
+                    }
+                    else if(matchesData[match]['squads'][team]['players'][player]['role'] === "1° riserva"){
+                        pageElem += `<span class="badge bg-warning text-dark" data-bs-toggle="tooltip" data-bs-placement="top" title="1° riserva">R1</span>`
+                    }
+                    else if(matchesData[match]['squads'][team]['players'][player]['role'] === "2° riserva"){
+                        pageElem += `<span class="badge bg-warning text-dark" data-bs-toggle="tooltip" data-bs-placement="top" title="2° riserva">R2</span>`
+                    }
+                    else if(matchesData[match]['squads'][team]['players'][player]['role'] === "3° riserva"){
+                        pageElem += `<span class="badge bg-warning text-dark" data-bs-toggle="tooltip" data-bs-placement="top" title="3° riserva">R3</span>`
+                    }
+                    pageElem += `</div></div></li>`;
+                } 
+                    
+                pageElem += `</ul></div>`
+        pageElemObj.innerHTML = pageElem.trim();
+        squadSummary.appendChild(pageElemObj);
+    }
+    
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+    return new bootstrap.Tooltip(tooltipTriggerEl)
+    })
+}
+
+function chapterScoresSelection(match){
+
+    scoreSummary = document.getElementById("squads-summary");
+    scoreSummary.innerHTML = ''
+    
+    for (let team in matchesData[match]['squads'])
+    {   
+        let pageElemObj = document.createElement('div')
+        pageElemObj.classList.add('page-element');
+        pageElemObj.classList.add('col-sm-6');
+        pageElem =`<div class="card shadow">
+                <div class="card-header row gx-0">
+                <h4 class="col-9">${teams_names.get(matchesData[match]['squads'][team]['team_id'])}</h4>
+                <h5 class="col-3 text-center">${matchesData[match]['squads'][team]['total_score']}</h5>
+                </div>
+                <ul class="list-group list-group"  style="height: 413px; max-height: 413px; overflow-y: scroll">`
+                for (let player in matchesData[match]['squads'][team]['players']){
+                    if(matchesData[match]['squads'][team]['players'][player]['score'] === 'None'){ // TODO: change with correct style
+                        matchesData[match]['squads'][team]['players'][player]['score'] = {};
+                    }
+                    pageElem += `<li class="list-group-item">
+                    <div class="row">
+                    <div class="col-5" data-bs-toggle="offcanvas" href="#charStatOffcanvas" role="button" aria-controls="charStatOffcanvas" onclick="loadPlayerOffcanvas('${matchesData[match]['squads'][team]['players'][player]['name']}')">
+                    ${matchesData[match]['squads'][team]['players'][player]['name']} `
+
+                    // Create the score part to calculate the total score of the player
+                    total_player_score = 0;
+                    scoreElem = `<div class="col-7">`
+                    Object.keys(matchesData[match]['squads'][team]['players'][player]['score']).forEach(key => {
+                        if(matchesData[match]['squads'][team]['players'][player]['score'][key] > 0){
+                            scoreElem += `<span class="badge bg-success me-2" data-bs-toggle="tooltip" data-bs-placement="top" title="${scoresData[key]['description']}">
+                            ${key} ${matchesData[match]['squads'][team]['players'][player]['score'][key]}</span>`
+                        }
+                        else {
+                            scoreElem += `<span class="badge bg-danger me-2" data-bs-toggle="tooltip" data-bs-placement="top" title="${scoresData[key]['description']}">
+                            ${key} ${matchesData[match]['squads'][team]['players'][player]['score'][key]}</span>`
+                        }
+                        total_player_score += parseFloat(matchesData[match]['squads'][team]['players'][player]['score'][key]);
+                    });
+                    scoreElem += `</div>`;
+
+                    if(matchesData[match]['squads'][team]['players'][player]['role'] === "Capitano"){
+                        pageElem += `<span class="badge bg-primary">x2</span> <span class="badge bg-secondary">${total_player_score*2}</span>`
+                    } 
+                    else if(matchesData[match]['squads'][team]['players'][player]['role'] === "Vice"){
+                        pageElem += `<span class="badge bg-info text-dark">x1.5</span> <span class="badge bg-secondary">${total_player_score*1.5}</span>`
+                    }
+                    else
+                    {
+                        pageElem += `<span class="badge bg-secondary">${total_player_score}</span>`
+                    }
+                    pageElem += `</div>` + scoreElem + `</li>`;
+                } 
+                    
+                pageElem += `</ul></div>`
+        pageElemObj.innerHTML = pageElem.trim();
+        scoreSummary.appendChild(pageElemObj);
+    }
+    
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+    return new bootstrap.Tooltip(tooltipTriggerEl)
+    })
+}
+
+function chapterSquadsInsertSelection(match){
+
+    squadSummary = document.getElementById("squads-summary");
+    squadSummary.innerHTML = ''
+    
+    console.log(Telegram.WebApp)
+    // if (Telegram.WebApp.initData !== "") {                      //test DELETE ME 
+    if (Telegram.WebApp.initData === "") {
+        // Tell the user to open from telegram
+        console.log("NO telegram data")
+    }
+    else 
     {
-        if(matchesData[match]['chapter'] != value) {continue;}
-        
+        // Find the team id using the owner username
+        let user_team_id = '';
+        for (let team in teamsData)
+        {
+            // if (teamsData[team]["owner"] === ('@zii_fons') ) { //DELETE ME 
+            if (teamsData[team]["owner"] === ('@' + Telegram.WebApp.initDataUnsafe.user.username) ) {
+                user_team_id = teamsData[team]["team_id"];
+                break;
+            }
+        }
+
+        const dataToSend = {   
+            initData: Telegram.WebApp.initData,
+            command: "retrieve_team_info",
+            squadData: user_team_id
+        };
+
+        // Make the POST request using fetch
+        fetch('https://lhkbtday6kadh4pmzfnemlpqzq0plkki.lambda-url.eu-north-1.on.aws/web_interface', {
+            method: 'POST',
+            mode: 'same-origin',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(dataToSend),
+        })
+        .then(response => response.json()) // Assuming the response is JSON
+        .then(data => {
+            // window.alert(data);
+            matchesData = JSON.parse(data);
+            console.log(data)
+        })
+        .catch((error) => {
+            console.error('Error:', error);
+        });
+
         for (let team in matchesData[match]['squads'])
         {   
+            if (matchesData[match]['squads'][team]['team_id'] !== user_team_id) {continue;}
+
             let pageElemObj = document.createElement('div')
             pageElemObj.classList.add('page-element');
             pageElemObj.classList.add('col-sm-6');
             pageElem =`<div class="card shadow">
                     <div class="card-header row gx-0">
-                    <h4 class="col-9">${teams_names.get(matchesData[match]['squads'][team]['team_id'])}</h4>
-                    <h5 class="col-3 text-center">${matchesData[match]['squads'][team]['total_score']}</h5>
+                    <h4>${teams_names.get(matchesData[match]['squads'][team]['team_id'])}</h4>
                     </div>
                     <ul class="list-group list-group">`
                     for (let player in matchesData[match]['squads'][team]['players']){
+                        if (matchesData[match]['squads'][team]['players'][player]['role'] === "None") {
+                            matchesData[match]['squads'][team]['players'][player]['role'] = "Titolare"
+                        }
                         pageElem += `<li class="list-group-item">
                         <div class="row">
-                        <div class="col-10" data-bs-toggle="offcanvas" href="#charStatOffcanvas" role="button" aria-controls="charStatOffcanvas" onclick="loadPlayerOffcanvas('${matchesData[match]['squads'][team]['players'][player]['name']}')"> 
+                        <div class="col-7" data-bs-toggle="offcanvas" href="#charStatOffcanvas" role="button" aria-controls="charStatOffcanvas" onclick="loadPlayerOffcanvas('${matchesData[match]['squads'][team]['players'][player]['name']}')"> 
                         ${matchesData[match]['squads'][team]['players'][player]['name']}</div>
-                        <div class="col-2"> `
-                        if(matchesData[match]['squads'][team]['players'][player]['role'] === "Capitano"){
-                            pageElem += `<img src="https://i.ibb.co/w2JvZMW/captain-Icon.png" style="height: 20px" alt="Straw hat" data-bs-toggle="tooltip" data-bs-placement="top" title="Capitano">`
-                        } 
-                        else if(matchesData[match]['squads'][team]['players'][player]['role'] === "Vice"){
-                            pageElem += `<img src="https://i.ibb.co/PfP2zjs/viceIcon.png" style="height: 25px" alt="Gun" data-bs-toggle="tooltip" data-bs-placement="top" title="Vice">`
+                        <div class="col-5"> 
+                        <select class="form-select col" aria-label="Player role selection" id="player-role-selection" onchange="playerRoleSelect(${match},${team},${player},this.value)">`
+                        if (matchesData[match]['squads'][team]['players'][player]['role'] === "Capitano") {
+                            pageElem += `<option value="Capitano" selected>Capitano</option>`
                         }
-                        else if(matchesData[match]['squads'][team]['players'][player]['role'] === "1° riserva"){
-                            pageElem += `<span class="badge bg-warning text-dark" data-bs-toggle="tooltip" data-bs-placement="top" title="1° riserva">R1</span>`
+                        else
+                        {
+                            pageElem += `<option value="Capitano">Capitano</option>`
                         }
-                        else if(matchesData[match]['squads'][team]['players'][player]['role'] === "2° riserva"){
-                            pageElem += `<span class="badge bg-warning text-dark" data-bs-toggle="tooltip" data-bs-placement="top" title="2° riserva">R2</span>`
+                        if (matchesData[match]['squads'][team]['players'][player]['role'] === "Vice") {
+                            pageElem += `<option value="Vice" selected>Vice</option>`
                         }
-                        else if(matchesData[match]['squads'][team]['players'][player]['role'] === "3° riserva"){
-                            pageElem += `<span class="badge bg-warning text-dark" data-bs-toggle="tooltip" data-bs-placement="top" title="3° riserva">R3</span>`
+                        else
+                        {
+                            pageElem += `<option value="Vice">Vice</option>`
                         }
-                        pageElem += `</div></div></li>`;
+                        if (matchesData[match]['squads'][team]['players'][player]['role'] === "Titolare") {
+                            pageElem += `<option value="Titolare" selected>Titolare</option>`
+                        }
+                        else
+                        {
+                            pageElem += `<option value="Titolare">Titolare</option>`
+                        }
+                        if (matchesData[match]['squads'][team]['players'][player]['role'] === "1° riserva") {
+                            pageElem += `<option value="1° riserva" selected>1° riserva</option>`
+                        }
+                        else
+                        {
+                            pageElem += `<option value="1° riserva">1° riserva</option>`
+                        }
+                        if (matchesData[match]['squads'][team]['players'][player]['role'] === "2° riserva") {
+                            pageElem += `<option value="2° riserva" selected>2° riserva</option>`
+                        }
+                        else
+                        {
+                            pageElem += `<option value="2° riserva">2° riserva</option>`
+                        }
+                        if (matchesData[match]['squads'][team]['players'][player]['role'] === "3° riserva") {
+                            pageElem += `<option value="3° riserva" selected>3° riserva</option>`
+                        }
+                        else
+                        {
+                            pageElem += `<option value="3° riserva">3° riserva</option>`
+                        }
+                        pageElem += `</select></div></div></li>`;
                     } 
                         
                     pageElem += `</ul></div>`
@@ -102,134 +301,56 @@ function chapterSquadsSelection(value){
             squadSummary.appendChild(pageElemObj);
         }
     }
-    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
-    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
-    return new bootstrap.Tooltip(tooltipTriggerEl)
-    })
 }
 
-function chapterScoresSelection(value){
-
-    scoreSummary = document.getElementById("squads-summary");
-    scoreSummary.innerHTML = ''
-    
-    for (let match in matchesData)
-    {
-        if(matchesData[match]['chapter'] != value) {continue;}
-        
-        for (let team in matchesData[match]['squads'])
-        {   
-            let pageElemObj = document.createElement('div')
-            pageElemObj.classList.add('page-element');
-            pageElemObj.classList.add('col-sm-6');
-            pageElem =`<div class="card shadow">
-                    <div class="card-header row gx-0">
-                    <h4 class="col-9">${teams_names.get(matchesData[match]['squads'][team]['team_id'])}</h4>
-                    <h5 class="col-3 text-center">${matchesData[match]['squads'][team]['total_score']}</h5>
-                    </div>
-                    <ul class="list-group list-group"  style="height: 413px; max-height: 413px; overflow-y: scroll">`
-                    for (let player in matchesData[match]['squads'][team]['players']){
-                        if(matchesData[match]['squads'][team]['players'][player]['score'] === 'None'){ // TODO: change with correct style
-                            matchesData[match]['squads'][team]['players'][player]['score'] = {};
-                        }
-                        pageElem += `<li class="list-group-item">
-                        <div class="row">
-                        <div class="col-5" data-bs-toggle="offcanvas" href="#charStatOffcanvas" role="button" aria-controls="charStatOffcanvas" onclick="loadPlayerOffcanvas('${matchesData[match]['squads'][team]['players'][player]['name']}')">
-                        ${matchesData[match]['squads'][team]['players'][player]['name']} `
-
-                        // Create the score part to calculate the total score of the player
-                        total_player_score = 0;
-                        scoreElem = `<div class="col-7">`
-                        Object.keys(matchesData[match]['squads'][team]['players'][player]['score']).forEach(key => {
-                            if(matchesData[match]['squads'][team]['players'][player]['score'][key] > 0){
-                                scoreElem += `<span class="badge bg-success me-2" data-bs-toggle="tooltip" data-bs-placement="top" title="${scoresData[key]['description']}">
-                                ${key} ${matchesData[match]['squads'][team]['players'][player]['score'][key]}</span>`
-                            }
-                            else {
-                                scoreElem += `<span class="badge bg-danger me-2" data-bs-toggle="tooltip" data-bs-placement="top" title="${scoresData[key]['description']}">
-                                ${key} ${matchesData[match]['squads'][team]['players'][player]['score'][key]}</span>`
-                            }
-                            total_player_score += parseFloat(matchesData[match]['squads'][team]['players'][player]['score'][key]);
-                        });
-                        scoreElem += `</div>`;
-
-                        if(matchesData[match]['squads'][team]['players'][player]['role'] === "Capitano"){
-                            pageElem += `<span class="badge bg-primary">x2</span> <span class="badge bg-secondary">${total_player_score*2}</span>`
-                        } 
-                        else if(matchesData[match]['squads'][team]['players'][player]['role'] === "Vice"){
-                            pageElem += `<span class="badge bg-info text-dark">x1.5</span> <span class="badge bg-secondary">${total_player_score*1.5}</span>`
-                        }
-                        else
-                        {
-                            pageElem += `<span class="badge bg-secondary">${total_player_score}</span>`
-                        }
-                        pageElem += `</div>` + scoreElem + `</li>`;
-                    } 
-                        
-                    pageElem += `</ul></div>`
-            pageElemObj.innerHTML = pageElem.trim();
-            scoreSummary.appendChild(pageElemObj);
-        }
-    }
-    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
-    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
-    return new bootstrap.Tooltip(tooltipTriggerEl)
-    })
+function playerRoleSelect(match, team, player, selectedRole){
+    matchesData[match]['squads'][team]['players'][player]['role'] = selectedRole;
+    console.log(matchesData);
 }
 
 function storeUserSquad() {
-            console.log(Telegram.WebApp)
-            
-            let user_squad;
-            // Build data to send to backend
-            let user_team_id = '';
-            for (let team in teamsData)
-            {
-                if (teamsData[team]["owner"] === ('@' + Telegram.WebApp.initDataUnsafe.user.username) ) {
-                    user_team_id = teamsData[team]["team_id"];
-                    break;
-                }
-            }
+    
+    let user_squad;
 
-            for (let match = matchesData.length-1; match >= 0; match--)
-            {
-                if(matchesData[match]['state'] !== "WAIT_RANKING") {continue;}
-            
-                for (let team in matchesData[match]['squads'])
-                {
-                    if (matchesData[match]['squads'][team]["team_id"]===user_team_id) {
-                        user_squad = matchesData[match]['squads'][team];
-                        break;
-                    }
-                }
-                break;  // Only need to find the first completed chapter
+    for (let match = matchesData.length-1; match >= 0; match--)
+    {
+        if(matchesData[match]['state'] !== "WAIT_RANKING") {continue;}
+    
+        for (let team in matchesData[match]['squads'])
+        {
+            if (matchesData[match]['squads'][team]["team_id"]===user_team_id) {
+                user_squad = matchesData[match]['squads'][team];
+                break;
             }
-            //TEST to verify if it changes This will be the built object to send
-            for (let player in user_squad["players"])
-            {
-                user_squad["players"][player]["role"] = "Titolare"
-            }
-
-            const dataToSend = {
-                initData: Telegram.WebApp.initData,
-                squadData: JSON.stringify(user_squad)
-            };
-
-            // Make the POST request using fetch
-            fetch('https://lhkbtday6kadh4pmzfnemlpqzq0plkki.lambda-url.eu-north-1.on.aws/web_interface', {
-                method: 'POST',
-                mode: 'same-origin',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(dataToSend),
-            })
-            .then(response => response.json()) // Assuming the response is JSON
-            .then(data => {
-                // window.alert(data);
-                console.log(data)
-            })
-            .catch((error) => {
-                console.error('Error:', error);
-            });
         }
+        break;  // Only need to find the first completed chapter
+    }
+    //TEST to verify if it changes This will be the built object to send
+    for (let player in user_squad["players"])
+    {
+        user_squad["players"][player]["role"] = "Titolare"
+    }
+
+    const dataToSend = {
+        initData: Telegram.WebApp.initData,
+        squadData: JSON.stringify(user_squad)
+    };
+
+    // Make the POST request using fetch
+    fetch('https://lhkbtday6kadh4pmzfnemlpqzq0plkki.lambda-url.eu-north-1.on.aws/web_interface', {
+        method: 'POST',
+        mode: 'same-origin',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(dataToSend),
+    })
+    .then(response => response.json()) // Assuming the response is JSON
+    .then(data => {
+        // window.alert(data);
+        console.log(data)
+    })
+    .catch((error) => {
+        console.error('Error:', error);
+    });
+}
