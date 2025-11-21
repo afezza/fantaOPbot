@@ -381,8 +381,7 @@ function storeUserSquad() {
     })
     .then(response => response.json()) // Assuming the response is JSON
     .then(data => {
-        // window.alert(data);
-        console.log(data)
+        window.alert(data);
     })
     .catch((error) => {
         console.error('Error:', error);
