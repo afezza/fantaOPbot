@@ -185,122 +185,82 @@ function chapterSquadsInsertSelection(match){
 
     squadSummary = document.getElementById("squads-summary");
     squadSummary.innerHTML = ''
-    
-    // if (Telegram.WebApp.initData !== "") {                      //test DELETE ME 
-    if (Telegram.WebApp.initData === "") {
-        // Tell the user to open from telegram
-        console.log("NO telegram data")
-    }
-    else 
-    {
-        // Find the team id using the owner username
-        for (let team in teamsData)
-        {
-            // if (teamsData[team]["owner"] === ('@zii_fons') ) { //DELETE ME 
-            if (teamsData[team]["owner"] === ('@' + Telegram.WebApp.initDataUnsafe.user.username) ) {
-                user_team_id = teamsData[team]["team_id"];
-                break;
-            }
-        }
 
-        const dataToSend = {   
-            initData: Telegram.WebApp.initData,
-            command: "retrieve_team_info",
-            squadData: user_team_id
-        };
+    for (let team in matchesData[match]['squads'])
+    {   
+        if (matchesData[match]['squads'][team]['team_id'] !== user_team_id) {continue;}
 
-        // Make the POST request using fetch
-        fetch('https://lhkbtday6kadh4pmzfnemlpqzq0plkki.lambda-url.eu-north-1.on.aws/web_interface', {
-            method: 'POST',
-            mode: 'same-origin',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(dataToSend),
-        })
-        .then(response => response.json()) // Assuming the response is JSON
-        .then(data => {
-            matchesData = data;
-            for (let team in matchesData[match]['squads'])
-            {   
-                if (matchesData[match]['squads'][team]['team_id'] !== user_team_id) {continue;}
-
-                let pageElemObj = document.createElement('div')
-                pageElemObj.classList.add('page-element');
-                pageElemObj.classList.add('col-sm-6');
-                pageElem =`<div class="card shadow">
-                        <div class="card-header row gx-0">
-                        <h4 class="col-9">${teams_names.get(matchesData[match]['squads'][team]['team_id'])}</h4>
-                        <div class="col-3">`
-                            if (match > 0) {
-                                pageElem += `<button type="button" class="btn btn-outline-primary btn-sm" onclick="loadLastChapSquad(${match},${team})"><i class="bi bi-arrow-clockwise"></i></button>`
-                            }
-                            pageElem += `<button type="button" class="btn btn-outline-primary btn-sm" onclick="storeUserSquad()"><i class="bi bi-floppy2-fill"></i></button>
-                        </div></div>
-                        <ul class="list-group list-group">`
-                        for (let player in matchesData[match]['squads'][team]['players']){
-                            if (matchesData[match]['squads'][team]['players'][player]['role'] === "None") {
-                                matchesData[match]['squads'][team]['players'][player]['role'] = "Titolare"
-                            }
-                            pageElem += `<li class="list-group-item">
-                            <div class="row">
-                            <div class="col-6" data-bs-toggle="offcanvas" href="#charStatOffcanvas" role="button" aria-controls="charStatOffcanvas" onclick="loadPlayerOffcanvas('${matchesData[match]['squads'][team]['players'][player]['name']}')"> 
-                            ${matchesData[match]['squads'][team]['players'][player]['name']}</div>
-                            <div class="col-6"> 
-                            <select class="form-select col" aria-label="Player role selection" id="player-role-selection" onchange="playerRoleSelect(${match},${team},${player},this.value)">`
-                            if (matchesData[match]['squads'][team]['players'][player]['role'] === "Capitano") {
-                                pageElem += `<option value="Capitano" selected>Capitano</option>`
-                            }
-                            else
-                            {
-                                pageElem += `<option value="Capitano">Capitano</option>`
-                            }
-                            if (matchesData[match]['squads'][team]['players'][player]['role'] === "Vice") {
-                                pageElem += `<option value="Vice" selected>Vice</option>`
-                            }
-                            else
-                            {
-                                pageElem += `<option value="Vice">Vice</option>`
-                            }
-                            if (matchesData[match]['squads'][team]['players'][player]['role'] === "Titolare") {
-                                pageElem += `<option value="Titolare" selected>Titolare</option>`
-                            }
-                            else
-                            {
-                                pageElem += `<option value="Titolare">Titolare</option>`
-                            }
-                            if (matchesData[match]['squads'][team]['players'][player]['role'] === "1° riserva") {
-                                pageElem += `<option value="1° riserva" selected>1° riserva</option>`
-                            }
-                            else
-                            {
-                                pageElem += `<option value="1° riserva">1° riserva</option>`
-                            }
-                            if (matchesData[match]['squads'][team]['players'][player]['role'] === "2° riserva") {
-                                pageElem += `<option value="2° riserva" selected>2° riserva</option>`
-                            }
-                            else
-                            {
-                                pageElem += `<option value="2° riserva">2° riserva</option>`
-                            }
-                            if (matchesData[match]['squads'][team]['players'][player]['role'] === "3° riserva") {
-                                pageElem += `<option value="3° riserva" selected>3° riserva</option>`
-                            }
-                            else
-                            {
-                                pageElem += `<option value="3° riserva">3° riserva</option>`
-                            }
-                            pageElem += `</select></div></div></li>`;
-                        } 
-                            
-                        pageElem += `</ul></div>`
-                pageElemObj.innerHTML = pageElem.trim();
-                squadSummary.appendChild(pageElemObj);
-            }
-        })
-        .catch((error) => {
-            console.error('Error:', error);
-        });
+        let pageElemObj = document.createElement('div')
+        pageElemObj.classList.add('page-element');
+        pageElemObj.classList.add('col-sm-6');
+        pageElem =`<div class="card shadow">
+                <div class="card-header row gx-0">
+                <h4 class="col-9">${teams_names.get(matchesData[match]['squads'][team]['team_id'])}</h4>
+                <div class="col-3">`
+                    if (match > 0) {
+                        pageElem += `<button type="button" class="btn btn-outline-primary btn-sm" onclick="loadLastChapSquad(${match},${team})"><i class="bi bi-arrow-clockwise"></i></button>`
+                    }
+                    pageElem += `<button type="button" class="btn btn-outline-primary btn-sm" onclick="storeUserSquad()"><i class="bi bi-floppy2-fill"></i></button>
+                </div></div>
+                <ul class="list-group list-group">`
+                for (let player in matchesData[match]['squads'][team]['players']){
+                    if (matchesData[match]['squads'][team]['players'][player]['role'] === "None") {
+                        matchesData[match]['squads'][team]['players'][player]['role'] = "Titolare"
+                    }
+                    pageElem += `<li class="list-group-item">
+                    <div class="row">
+                    <div class="col-6" data-bs-toggle="offcanvas" href="#charStatOffcanvas" role="button" aria-controls="charStatOffcanvas" onclick="loadPlayerOffcanvas('${matchesData[match]['squads'][team]['players'][player]['name']}')"> 
+                    ${matchesData[match]['squads'][team]['players'][player]['name']}</div>
+                    <div class="col-6"> 
+                    <select class="form-select col" aria-label="Player role selection" id="player-role-selection" onchange="playerRoleSelect(${match},${team},${player},this.value)">`
+                    if (matchesData[match]['squads'][team]['players'][player]['role'] === "Capitano") {
+                        pageElem += `<option value="Capitano" selected>Capitano</option>`
+                    }
+                    else
+                    {
+                        pageElem += `<option value="Capitano">Capitano</option>`
+                    }
+                    if (matchesData[match]['squads'][team]['players'][player]['role'] === "Vice") {
+                        pageElem += `<option value="Vice" selected>Vice</option>`
+                    }
+                    else
+                    {
+                        pageElem += `<option value="Vice">Vice</option>`
+                    }
+                    if (matchesData[match]['squads'][team]['players'][player]['role'] === "Titolare") {
+                        pageElem += `<option value="Titolare" selected>Titolare</option>`
+                    }
+                    else
+                    {
+                        pageElem += `<option value="Titolare">Titolare</option>`
+                    }
+                    if (matchesData[match]['squads'][team]['players'][player]['role'] === "1° riserva") {
+                        pageElem += `<option value="1° riserva" selected>1° riserva</option>`
+                    }
+                    else
+                    {
+                        pageElem += `<option value="1° riserva">1° riserva</option>`
+                    }
+                    if (matchesData[match]['squads'][team]['players'][player]['role'] === "2° riserva") {
+                        pageElem += `<option value="2° riserva" selected>2° riserva</option>`
+                    }
+                    else
+                    {
+                        pageElem += `<option value="2° riserva">2° riserva</option>`
+                    }
+                    if (matchesData[match]['squads'][team]['players'][player]['role'] === "3° riserva") {
+                        pageElem += `<option value="3° riserva" selected>3° riserva</option>`
+                    }
+                    else
+                    {
+                        pageElem += `<option value="3° riserva">3° riserva</option>`
+                    }
+                    pageElem += `</select></div></div></li>`;
+                } 
+                    
+                pageElem += `</ul></div>`
+        pageElemObj.innerHTML = pageElem.trim();
+        squadSummary.appendChild(pageElemObj);
     }
 }
 
