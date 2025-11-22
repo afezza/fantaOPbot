@@ -186,6 +186,16 @@ function chapterSquadsInsertSelection(match){
     squadSummary = document.getElementById("squads-summary");
     squadSummary.innerHTML = ''
 
+    // Find the team id using the owner username
+    let user_team_id;
+    for (let team in teamsData)
+    {
+        if (teamsData[team]["owner"] === ('@' + Telegram.WebApp.initDataUnsafe.user.username) ) {
+            user_team_id = teamsData[team]["team_id"];
+            break;
+        }
+    }
+
     for (let team in matchesData[match]['squads'])
     {   
         if (matchesData[match]['squads'][team]['team_id'] !== user_team_id) {continue;}
