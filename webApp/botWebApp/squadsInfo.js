@@ -1,7 +1,6 @@
 var isScoresRequired = false;
 var chapterSelected = 0;
 let user_team_id = '';
-let user_team_id;
 
 function loadSquadsInfo() {
 
@@ -195,7 +194,7 @@ function chapterSquadsInsertSelection(match){
             break;
         }
     }
-    console.log(user_team_id)
+
     for (let team in matchesData[match]['squads'])
     {   
         if (matchesData[match]['squads'][team]['team_id'] !== user_team_id) {continue;}
