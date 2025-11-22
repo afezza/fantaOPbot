@@ -56,6 +56,7 @@ function createClassificationChart(){
     let team_name_collection = {};
     for (let team in teamsData) //returns the index
     {
+        console.log(teamsData[team]['team_id'])
         team_name_collection[teamsData[team]['team_id']] =
             {
             x: teamsData[team]['team_name'],
