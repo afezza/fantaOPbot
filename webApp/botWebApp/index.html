@@ -31,9 +31,10 @@
     <script src="https://cdn.jsdelivr.net/npm/jstat@latest/dist/jstat.min.js"></script>
 
     <script>
-        const scoresData = //SCORES_LIST;
-        let matchesData = //MATCHES_LIST;
-        let teamsData = //TEAMS_LIST;
+
+        let scoresData;//SCORES_LIST;
+        let matchesData;//MATCHES_LIST;
+        let teamsData;//TEAMS_LIST;
         
         let teams_names = new Map();
         let teams_classification = [];
@@ -79,8 +80,39 @@
 
         }
 
+        async function downloadWebAppData() {
+            if (Telegram.WebApp.initData === "") {
+                // Tell the user to open from telegram
+                console.log("NO telegram data")
+                return
+            }
+
+            const dataToSend = {   
+                initData: Telegram.WebApp.initData,
+                command: "retrieve_page_info",
+            };
+
+            // Make the POST request using fetch
+            response = await fetch('https://lhkbtday6kadh4pmzfnemlpqzq0plkki.lambda-url.eu-north-1.on.aws/web_interface', {
+                method: 'POST',
+                mode: 'same-origin',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(dataToSend),
+            })
+            data = await response.json();
+            // console.log(data)
+            scoresData = JSON.parse(data["scores"]);
+            matchesData = JSON.parse(data["matches"]);
+            teamsData = JSON.parse(data["teams"]);        
+        }
+
         // webapp main
-        document.addEventListener("DOMContentLoaded", function() {
+        document.addEventListener("DOMContentLoaded", async function() {
+            // Download all the required data
+            await downloadWebAppData();
+
             // Generate the mapping for teams id/name
             for (let team in teamsData){
                 teams_names.set(teamsData[team]['team_id'],teamsData[team]['team_name'])
