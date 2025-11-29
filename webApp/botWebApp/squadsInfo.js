@@ -123,13 +123,42 @@ function chapterScoresSelection(match){
     
     for (let team in matchesData[match]['squads'])
     {   
+        let optimal_res = [];
+        for (let player in matchesData[match]['squads'][team]['players']){
+            if(matchesData[match]['squads'][team]['players'][player]['score'] === 'None'){ // TODO: change with correct style
+                matchesData[match]['squads'][team]['players'][player]['score'] = {};
+            }
+
+            total_player_score = 0;
+            Object.keys(matchesData[match]['squads'][team]['players'][player]['score']).forEach(key => {
+                total_player_score += parseFloat(matchesData[match]['squads'][team]['players'][player]['score'][key]);
+            });
+            optimal_res.push({"name" :  matchesData[match]['squads'][team]['players'][player]['name'],
+                            "score" : total_player_score})
+        }
+        optimal_res.sort((a, b) => parseFloat(b.score) - parseFloat(a.score));
+        optimal_res[0].score *= 2.0;
+        optimal_res[1].score *= 1.5;
+        let total_opt_score = 0.0;
+        let counter = 0;
+        for (let score in optimal_res)
+        {
+            if (counter > 7) {
+                break;
+            }
+            total_opt_score += parseFloat(optimal_res[score]["score"]);
+            counter += 1;
+            console.log(total_opt_score)
+        }
+
         let pageElemObj = document.createElement('div')
         pageElemObj.classList.add('page-element');
         pageElemObj.classList.add('col-sm-6');
         pageElem =`<div class="card shadow">
                 <div class="card-header row gx-0">
                 <h4 class="col-9">${teams_names.get(matchesData[match]['squads'][team]['team_id'])}</h4>
-                <h5 class="col-3 text-center">${matchesData[match]['squads'][team]['total_score']}</h5>
+                <h5 class="col-3 text-center" data-bs-html="true" data-bs-toggle="tooltip" data-bs-placement="top" title="Ottimo: ${total_opt_score}<br>Scarto: ${(total_opt_score-matchesData[match]['squads'][team]['total_score'])}">
+                ${matchesData[match]['squads'][team]['total_score']}</h5>
                 </div>
                 <ul class="list-group list-group"  style="height: 413px; max-height: 413px; overflow-y: scroll">`
                 for (let player in matchesData[match]['squads'][team]['players']){
