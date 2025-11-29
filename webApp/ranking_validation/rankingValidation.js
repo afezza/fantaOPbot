@@ -242,8 +242,9 @@ document.getElementById('saveButton').addEventListener('click', function() {
         jsonData: JSON.stringify(matchesData)
     };
 
+    let url_to_post = 'https://lhkbtday6kadh4pmzfnemlpqzq0plkki.lambda-url.eu-north-1.on.aws/rank_validation' + window.location.search;
     // Make the POST request using fetch
-    fetch('https://lhkbtday6kadh4pmzfnemlpqzq0plkki.lambda-url.eu-north-1.on.aws/rank_validation', {
+    fetch(url_to_post, {
         method: 'POST',
         // mode: 'no-cors',
         mode: 'same-origin',
