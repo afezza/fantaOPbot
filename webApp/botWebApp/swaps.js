@@ -154,11 +154,16 @@ function storeUserOffers(selected_team) {
 
     let offerts_value = 0;
     let send_text = '';
+    let offerts_completed = 0;
     for (let i = 0; i < teamsData[selected_team]['swap'].length; i++) {
+        if (teamsData[selected_team]['swap'][i]['buy'] != "") {
+            offerts_completed += 1;
+            continue
+        }
         offerts_value += parseInt(document.getElementById(`offertInput-${i}`).value);
         send_text += document.getElementById(`nameInput-${i}`).value + " " + document.getElementById(`offertInput-${i}`).value + "\n";
     }
-    if (offerts_value > (parseInt(teamsData[selected_team]['tokens_left']) + teamsData[selected_team]['swap'].length)) {
+    if (offerts_value > (parseInt(teamsData[selected_team]['tokens_left']) + teamsData[selected_team]['swap'].length - offerts_completed)) {
         window.alert("Berries insufficienti. Controlla le offerte e riprova.");
         return;
     }
