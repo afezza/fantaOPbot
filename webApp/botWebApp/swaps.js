@@ -108,6 +108,9 @@ function loadSwapsInfo() {
                 </div></div>
                 <ul class="list-group list-group">`
             for (let i = 0; i < teamsData[selected_team]['swap'].length; i++) {
+                if (teamsData[selected_team]['swap'][i]['buy'] != "") {
+                    continue
+                }
                 pageElem += `<li class="list-group-item">
                     <input type="text" class="form-control" id="nameInput-${i}" placeholder="Nome personaggio">
                     <input type="number" class="form-control" id="offertInput-${i}" placeholder="Offerta">
