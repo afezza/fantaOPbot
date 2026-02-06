@@ -140,15 +140,12 @@ function chapterScoresSelection(match){
         optimal_res[0].score *= 2.0;
         optimal_res[1].score *= 1.5;
         let total_opt_score = 0.0;
-        let counter = 0;
         for (let score in optimal_res)
         {
-            if (counter > 7) {
+            if (score >= 7) {
                 break;
             }
             total_opt_score += parseFloat(optimal_res[score]["score"]);
-            counter += 1;
-            console.log(total_opt_score)
         }
 
         let pageElemObj = document.createElement('div')
@@ -161,7 +158,7 @@ function chapterScoresSelection(match){
                 ${matchesData[match]['squads'][team]['total_score']}</h5>
                 </div>
                 <ul class="list-group list-group"  style="height: 413px; max-height: 413px; overflow-y: scroll">`
-                counter = 0;
+                let counter = 0;
                 for (let player in matchesData[match]['squads'][team]['players']){
                     if(matchesData[match]['squads'][team]['players'][player]['score'] === 'None'){ // TODO: change with correct style
                         matchesData[match]['squads'][team]['players'][player]['score'] = {};
