@@ -161,6 +161,7 @@ function chapterScoresSelection(match){
                 ${matchesData[match]['squads'][team]['total_score']}</h5>
                 </div>
                 <ul class="list-group list-group"  style="height: 413px; max-height: 413px; overflow-y: scroll">`
+                counter = 0;
                 for (let player in matchesData[match]['squads'][team]['players']){
                     if(matchesData[match]['squads'][team]['players'][player]['score'] === 'None'){ // TODO: change with correct style
                         matchesData[match]['squads'][team]['players'][player]['score'] = {};
@@ -186,15 +187,26 @@ function chapterScoresSelection(match){
                     });
                     scoreElem += `</div>`;
 
+                    if (total_player_score > 0) {
+                        counter += 1;
+                    }
+
                     if(matchesData[match]['squads'][team]['players'][player]['role'] === "Capitano"){
                         pageElem += `<span class="badge bg-primary">x2</span> <span class="badge bg-secondary">${total_player_score*2}</span>`
                     } 
                     else if(matchesData[match]['squads'][team]['players'][player]['role'] === "Vice"){
                         pageElem += `<span class="badge bg-info text-dark">x1.5</span> <span class="badge bg-secondary">${total_player_score*1.5}</span>`
                     }
-                    else
-                    {
+                    else if(matchesData[match]['squads'][team]['players'][player]['role'] === "Titolare"){
                         pageElem += `<span class="badge bg-secondary">${total_player_score}</span>`
+                    } 
+                    else{
+                        if (counter > 7) {
+                            pageElem += `<span class="badge bg-secondary">0</span>`
+                        }
+                        else {
+                            pageElem += `<span class="badge bg-secondary">${total_player_score}</span>`
+                        }
                     }
                     pageElem += `</div>` + scoreElem + `</li>`;
                 } 
