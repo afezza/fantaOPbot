@@ -55,7 +55,9 @@ function chapterSquadsScoreSelect(scoresReq,chapterReq){
         else
         {
             if (isScoresRequired) {
-                return chapterScoresSelection(match);
+                if (matchesData[match]['state'] === "COMPLETED") {
+                    return chapterScoresSelection(match);
+                }
             }
             else 
             {
@@ -72,13 +74,17 @@ function chapterSquadsSelection(match){
     
     for (let team in matchesData[match]['squads'])
     {   
+        actual_total_score = "0"
+        if (matchesData[match]['state'] === "COMPLETED") {
+            actual_total_score = matchesData[match]['squads'][team]['total_score']
+        }
         let pageElemObj = document.createElement('div')
         pageElemObj.classList.add('page-element');
         pageElemObj.classList.add('col-sm-6');
         pageElem =`<div class="card shadow">
                 <div class="card-header row gx-0">
                 <h4 class="col-9">${teams_names.get(matchesData[match]['squads'][team]['team_id'])}</h4>
-                <h5 class="col-3 text-center">${matchesData[match]['squads'][team]['total_score']}</h5>
+                <h5 class="col-3 text-center">${actual_total_score}</h5>
                 </div>
                 <ul class="list-group list-group">`
                 for (let player in matchesData[match]['squads'][team]['players']){
@@ -197,7 +203,7 @@ function chapterScoresSelection(match){
                     else if(matchesData[match]['squads'][team]['players'][player]['role'] === "Titolare"){
                         pageElem += `<span class="badge bg-secondary">${total_player_score}</span>`
                     } 
-                    else{
+                    else if(matchesData[match]['squads'][team]['players'][player]['role'] !== "None"){  // id this is a reserve player
                         if (counter > 7) {
                             pageElem += `<span class="badge bg-secondary">0</span>`
                         }
