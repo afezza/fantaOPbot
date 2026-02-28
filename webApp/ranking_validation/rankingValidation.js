@@ -52,16 +52,25 @@ function populateTabs() {
 }
 
 function loadTeamsForChapter(chapter) {
+    // Collect chapter info
     document.getElementById("chapterTitle").textContent = "Chapter " + chapter.chapter;
     document.getElementById("chapterStatus").value = chapter.state || "None";
     document.getElementById("chapterStatus").onchange = function() {
         chapter.state = this.value;
     };
+    // Get teams container and clean it's content
     const teamsContainer = document.getElementById("teamsContainer");
     teamsContainer.innerHTML = "";
+    // Recalculate the scores and generate div content
+    let teamsDivs = new Map();
     chapter.squads.forEach(team => {
-        const teamDiv = renderTeams(chapter,team);
-        teamsContainer.appendChild(teamDiv);
+        teamsDivs.set(team.team_id,renderTeams(chapter,team));
+    });
+    // Order the array based on total score
+    chapter.squads.sort((a, b) => parseFloat(b.total_score) - parseFloat(a.total_score));
+    // Add the content in the container
+    chapter.squads.forEach(team => {
+        teamsContainer.appendChild(teamsDivs.get(team.team_id));
     });
 }
 
@@ -119,6 +128,8 @@ function renderTeams(chapter,team) {
     teamDiv.classList.add("team");
     const playerList = document.createElement("ul");
     playerList.classList.add("player-list");
+
+    orderTeamsPlayers() // Reorder team player by role needs to correct calculate the final score
 
     players_score_counter = 0;
     team.total_score = 0;
@@ -189,13 +200,18 @@ function deleteScore(chapterId, playerName, scoreKey) {
 function addScore(chapterId, playerName) {
     const scoreKey = document.getElementById(`score-${chapterId}-${playerName}`).value;
 
-    console.log(chapterId + " => adding {" + scoreKey + "} to " + playerName);
+    // console.log(chapterId + " => adding {" + scoreKey + "} to " + playerName);
     matchesData.forEach(chapter => {
         if (chapterId === chapter.chapter) {
             chapter.squads.forEach(team => {
                 team.players.forEach(player => {
                     if (playerName === player.name) {
-                        player.score[scoreKey] = scores[scoreKey].value;
+                        if (player.role !== "None") {
+                            player.score[scoreKey] = scores[scoreKey].value;
+                        }
+                        else {
+                            player.score[scoreKey] = 0;
+                        }
                         loadTeamsForChapter(chapter);
                         return;
                     }
@@ -215,6 +231,31 @@ document.getElementById("searchBox").addEventListener("input", function() {
 });
 
 document.getElementById('saveButton').addEventListener('click', function() {
+    // Check for chapters that have scores but are not marked as complete 
+    let check_list = []
+    matchesData.forEach(chapter => {
+        // Ignore completed chapters
+        if(chapter.state === "COMPLETED"){
+            return;
+        }
+        // If one of the teams score is different than 0 report the chapter to check
+        chapter.squads.some(team => {
+            if (team.total_score !== 0) {
+                check_list.push(chapter.chapter);
+                return true;
+            }
+        });
+    });
+
+    // If there are chapter to check alert the user
+    if (check_list.length > 0) {
+        check_text = `The following chapters are not marked as completed but have scores saved.\n\n${check_list}`
+        check_text += `\n\nDo you want to save anyway?`
+        if(!window.confirm(check_text)){
+            return;
+        }
+    }
+
     // Convert empty objects to None
     matchesData.forEach(chapter => {
         // Check if the chapter data exsist
@@ -278,4 +319,9 @@ document.getElementById('saveButton').addEventListener('click', function() {
     });
 });
 
-populateTabs();
+document.addEventListener("DOMContentLoaded", function () {
+    const urlParams = new URLSearchParams(window.location.search);
+    document.getElementById('inputToken').value = urlParams.get("token");  
+
+    populateTabs();
+});
