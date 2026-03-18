@@ -85,11 +85,19 @@ function orderPlayerBySelection(selected_score)
     pageElemObj.classList.add('page-element');
     pageElemObj.classList.add('col-sm-12');
     
+    // Generate the players arrays with the selected statistic 
     let ordered_players_list = []; 
+    let ordered_players_list_prev = []; 
     if (selected_score == "chaper_value_score-last3") {
         players_statistics.forEach((value, key)=>{
             let jstat = this.jStat(value.get("chaper_value_score").slice(-3));
             ordered_players_list.push({name: key, value: jstat.sum()});
+            
+            let prev_arr = value.get("chaper_value_score").slice(-3,-1);
+            if (prev_arr.length > 0) {
+                let jstat_prev = this.jStat(prev_arr);
+                ordered_players_list_prev.push({name: key, value: jstat_prev.sum()});
+            }
         });
     }
     else
@@ -97,21 +105,46 @@ function orderPlayerBySelection(selected_score)
         players_statistics.forEach((value, key)=>{
             let jstat = this.jStat(value.get(selected_score));
             ordered_players_list.push({name: key, value: jstat.sum()});
+
+            let prev_arr = value.get(selected_score).slice(0,-1);
+            if (prev_arr.length > 0) {
+                let jstat_prev = this.jStat(prev_arr);
+                ordered_players_list_prev.push({name: key, value: jstat_prev.sum()});
+            }
         });
     }
     ordered_players_list.sort((a, b) => b.value - a.value);
+    if(ordered_players_list_prev.length > 0){
+        ordered_players_list_prev.sort((a, b) => b.value - a.value);
+    }
+    else{
+        ordered_players_list_prev = ordered_players_list;
+    }
 
     pageElem =`<div class="card shadow">
             <ul class="list-group list-group">`
-                ordered_players_list.forEach((value)=>{
+                ordered_players_list.forEach((value, index)=>{
                     if (value.value === 0) {
                         return;
                     }
                     pageElem += `<li class="list-group-item">
                     <div class="row">
-                    <div class="col-9" data-bs-toggle="offcanvas" href="#charStatOffcanvas" role="button" aria-controls="charStatOffcanvas" onclick="loadPlayerOffcanvas('${value.name}')">
+                    <div class="col-7" data-bs-toggle="offcanvas" href="#charStatOffcanvas" role="button" aria-controls="charStatOffcanvas" onclick="loadPlayerOffcanvas('${value.name}')">
                     ${value.name}</div>
-                    <div class="col-3"> ${value.value}</div></div></li>`;
+                    <div class="col-3"> ${value.value}</div>`;
+                    prev_index = ordered_players_list_prev.findIndex(player => player.name === value.name);
+                    if (prev_index === -1 || index === prev_index){
+                        pageElem += `<div class="col-2 text-primary"> <i class="bi bi-dash-circle-fill"></i></div>`
+                    }
+                    else if (index > prev_index) {
+                        pageElem += `<div class="col-2 text-danger data-bs-toggle="tooltip" data-bs-placement="top" title="${prev_index-index}"">
+                        <i class="bi bi-arrow-down-circle-fill"></i></div>`
+                    }
+                    else if (index < prev_index) {
+                        pageElem += `<div class="col-2 text-success data-bs-toggle="tooltip" data-bs-placement="top" title="${prev_index-index}""> 
+                        <i class="bi bi-arrow-up-circle-fill"></i></div>`
+                    }
+                    pageElem += `</div></li>`;
                 });
             pageElem += `</ul></div>
         </div>`
