@@ -28,12 +28,12 @@ function loadTeamsInfo(team_id) {
             </div>
             <div class="page-element col-sm-6">
                 <div class="card shadow">
-                <div class="card-body" id="donut-container" style="height: 450px; width: 100%;"></div>
+                <div class="card-body" id="donut-container"></div>
                 </div>
             </div>
             <div class="page-element col-sm-6">
                 <div class="card shadow">
-                <div class="card-body">
+                <div class="card-body" id="distances-container">
                     <div class="row" style="padding-top: 10px;padding-bottom: 10px;">
                         <div class="col-6">
                             <div class="text-center"><h6>Dal primo</h6></div>
@@ -73,7 +73,7 @@ function loadTeamsInfo(team_id) {
                     } 
                 pageContent += `</ul></div>
             </div>`
-            if(teamsData[selected_team]['swap'] !== "None")
+            if(teamsData[selected_team]['swap'] !== "None" && teamsData[selected_team]['swap'].length > 0)
             {
                 pageContent += `<div class="page-element col-sm-6">
                     <div class="card shadow">
