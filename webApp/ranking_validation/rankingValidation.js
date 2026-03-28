@@ -3,6 +3,7 @@ let matchesData = //CHAPTER_DATA;
 let teamsData = //TEAMS_DATA;
 
 const roles = ["None", "Capitano", "Vice", "Titolare", "1° riserva", "2° riserva", "3° riserva"];
+const TEAM_TOKEN_BUDGET = 300;
 
 let teams_names = new Map();
 
@@ -49,9 +50,25 @@ function populateTabs() {
         };
         tabPanel.appendChild(tab);
     });
+
+    // Teams editor tab
+    const teamsTab = document.createElement("div");
+    teamsTab.classList.add("tab-item");
+    teamsTab.id = "teams-editor-tab";
+    teamsTab.textContent = "Teams";
+    teamsTab.onclick = () => {
+        document.querySelectorAll(".tab-item").forEach(t => t.classList.remove("active"));
+        teamsTab.classList.add("active");
+        loadTeamsEditor();
+    };
+    tabPanel.appendChild(teamsTab);
 }
 
 function loadTeamsForChapter(chapter) {
+    // Restore chapter view elements
+    document.getElementById("chapterStatus").style.display = "";
+    document.getElementById("searchBox").style.display = "";
+    document.getElementById("teamsButtonsGroup").style.display = "none";
     // Collect chapter info
     document.getElementById("chapterTitle").textContent = "Chapter " + chapter.chapter;
     document.getElementById("chapterStatus").value = chapter.state || "None";
@@ -219,6 +236,187 @@ function addScore(chapterId, playerName) {
             });
         }
     });
+}
+
+function collectAllTeamEdits() {
+    // Header fields
+    document.querySelectorAll("input[data-field][data-team-id]:not([data-player-idx]):not([data-swap-idx])").forEach(input => {
+        if (input.dataset.field === "tokens_left") return;
+        const t = teamsData.find(t => t.team_id === input.dataset.teamId);
+        if (t) t[input.dataset.field] = input.value;
+    });
+    // Player fields
+    document.querySelectorAll("input[data-player-idx]").forEach(input => {
+        const t = teamsData.find(t => t.team_id === input.dataset.teamId);
+        if (t) t.players[parseInt(input.dataset.playerIdx)][input.dataset.field] = input.value;
+    });
+    // Swap fields
+    document.querySelectorAll("input[data-swap-idx]").forEach(input => {
+        const t = teamsData.find(t => t.team_id === input.dataset.teamId);
+        if (t && t.swap[parseInt(input.dataset.swapIdx)]) {
+            t.swap[parseInt(input.dataset.swapIdx)][input.dataset.field] = input.value;
+        }
+    });
+    // Recalculate tokens for all teams
+    teamsData.forEach(team => recalculateTeamTokens(team));
+}
+
+function applyTeamChanges() {
+    collectAllTeamEdits();
+    teamsData.forEach(team => {
+        const tokenInput = document.querySelector(`input[data-team-id="${team.team_id}"][data-field="tokens_left"]`);
+        if (tokenInput) tokenInput.value = team.tokens_left;
+    });
+}
+
+function loadTeamsEditor() {
+    collectAllTeamEdits(); // commit any in-flight edits before re-rendering
+
+    document.getElementById("chapterTitle").textContent = "Teams";
+    document.getElementById("chapterStatus").style.display = "none";
+    document.getElementById("searchBox").style.display = "none";
+    document.getElementById("teamsButtonsGroup").style.display = "flex";
+
+    const teamsContainer = document.getElementById("teamsContainer");
+    teamsContainer.innerHTML = "";
+
+    teamsData.forEach(team => {
+        ensureTeamHasFixedPlayers(team);
+        ensureTeamHasSwapList(team);
+        recalculateTeamTokens(team);
+        teamsContainer.appendChild(renderTeamEditor(team));
+    });
+}
+
+function ensureTeamHasFixedPlayers(team) {
+    if (!Array.isArray(team.players)) {
+        team.players = [];
+    }
+
+    while (team.players.length < 10) {
+        team.players.push({ name: "", price: "0" });
+    }
+
+    if (team.players.length > 10) {
+        team.players = team.players.slice(0, 10);
+    }
+}
+
+function ensureTeamHasSwapList(team) {
+    if (!Array.isArray(team.swap)) {
+        team.swap = [];
+    }
+}
+
+function recalculateTeamTokens(team) {
+    const spent = team.players.reduce((sum, player) => {
+        return sum + (parseFloat(player.price) || 0);
+    }, 0);
+    team.tokens_left = String(Math.max(0, TEAM_TOKEN_BUDGET - spent));
+}
+
+function renderTeamEditor(team) {
+    const teamDiv = document.createElement("div");
+    teamDiv.classList.add("team-editor");
+
+    const fields = [
+        { label: "Team Name", key: "team_name" },
+        { label: "Team ID", key: "team_id" },
+        { label: "Owner", key: "owner" },
+        { label: "Tokens Left", key: "tokens_left" },
+        { label: "Jolly Roger URL", key: "jolly_roger" },
+    ];
+
+    let headerHtml = '<div class="team-editor-header">';
+    fields.forEach(f => {
+        const safeVal = (team[f.key] || "").replace(/"/g, "&quot;");
+        const readOnly = f.key === "tokens_left" ? "readonly" : "";
+        headerHtml += `
+            <div class="team-field-group">
+                <span class="team-field-label">${f.label}</span>
+                <input class="editable-field" data-team-id="${team.team_id}" data-field="${f.key}" value="${safeVal}" ${readOnly}>
+            </div>`;
+    });
+    headerHtml += `<button class="remove-team-button" onclick="removeTeam('${team.team_id}')">Remove Team</button>`;
+    headerHtml += "</div>";
+
+    let playersHtml = "<h4>Players</h4><ul class=\"player-list\">";
+    team.players.forEach((player, idx) => {
+        const safeName = (player.name || "").replace(/"/g, "&quot;");
+        playersHtml += `
+            <li class="player-editor-item">
+                <input class="editable-field" style="flex:2" data-team-id="${team.team_id}" data-player-idx="${idx}" data-field="name" value="${safeName}" placeholder="Player name">
+                <input class="editable-field" style="flex:1;max-width:80px" type="number" data-team-id="${team.team_id}" data-player-idx="${idx}" data-field="price" value="${player.price}" placeholder="Price">
+            </li>`;
+    });
+    playersHtml += "</ul>";
+
+    let swapsHtml = `
+        <h4>Swaps</h4>
+        <ul class="player-list">
+            <li class="player-editor-item" style="background-color:#d0d0d0;font-weight:bold;">
+                <span style="flex:2">Sell</span>
+                <span style="flex:2">Buy</span>
+                <span style="flex:1;max-width:90px">Price</span>
+                <span style="flex:1;max-width:90px">Old price</span>
+                <span style="width:24px"></span>
+            </li>`;
+    team.swap.forEach((swapItem, idx) => {
+        const safeSell = (swapItem.sell || "").replace(/"/g, "&quot;");
+        const safeBuy = (swapItem.buy || "").replace(/"/g, "&quot;");
+        swapsHtml += `
+            <li class="player-editor-item">
+                <input class="editable-field" style="flex:2" data-team-id="${team.team_id}" data-swap-idx="${idx}" data-field="sell" value="${safeSell}" placeholder="Sell">
+                <input class="editable-field" style="flex:2" data-team-id="${team.team_id}" data-swap-idx="${idx}" data-field="buy" value="${safeBuy}" placeholder="Buy">
+                <input class="editable-field" style="flex:1;max-width:90px" type="number" data-team-id="${team.team_id}" data-swap-idx="${idx}" data-field="price" value="${swapItem.price || ""}" placeholder="Price">
+                <input class="editable-field" style="flex:1;max-width:90px" type="number" data-team-id="${team.team_id}" data-swap-idx="${idx}" data-field="old_price" value="${swapItem.old_price || ""}" placeholder="Old price">
+                <button class="trash-bin" onclick="removeSwapFromTeam('${team.team_id}', ${idx})">🗑️</button>
+            </li>`;
+    });
+    swapsHtml += `</ul><button class="add-button" onclick="addSwapToTeam('${team.team_id}')">+ Add Swap</button>`;
+
+    teamDiv.innerHTML = headerHtml + playersHtml + swapsHtml;
+
+    return teamDiv;
+}
+
+function addNewTeam() {
+    teamsData.push({
+        team_name: "New Team",
+        team_id: Date.now().toString(),
+        owner: "",
+        tokens_left: String(TEAM_TOKEN_BUDGET),
+        jolly_roger: "",
+        players: Array.from({ length: 10 }, () => ({ name: "", price: "0" })),
+        swap: []
+    });
+    loadTeamsEditor();
+}
+
+function removeTeam(teamId) {
+    const idx = teamsData.findIndex(t => t.team_id === teamId);
+    if (idx !== -1) {
+        teamsData.splice(idx, 1);
+        loadTeamsEditor();
+    }
+}
+
+function addSwapToTeam(teamId) {
+    const team = teamsData.find(t => t.team_id === teamId);
+    if (team) {
+        ensureTeamHasSwapList(team);
+        team.swap.push({ sell: "", buy: "", price: "0", old_price: "0" });
+        loadTeamsEditor();
+    }
+}
+
+function removeSwapFromTeam(teamId, swapIdx) {
+    const team = teamsData.find(t => t.team_id === teamId);
+    if (team) {
+        ensureTeamHasSwapList(team);
+        team.swap.splice(swapIdx, 1);
+        loadTeamsEditor();
+    }
 }
 
 document.getElementById("searchBox").addEventListener("input", function() {
